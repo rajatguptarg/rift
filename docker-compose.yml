@@ -1,0 +1,59 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: rift-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: rift
+      MONGO_INITDB_ROOT_PASSWORD: riftdev
+      MONGO_INITDB_DATABASE: rift
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: rift-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  temporal:
+    image: temporalio/auto-setup:1.24
+    container_name: rift-temporal
+    ports:
+      - "7233:7233"
+    environment:
+      - DB=sqlite
+    depends_on:
+      - temporal-ui
+    healthcheck:
+      test: ["CMD", "temporal", "server", "health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  temporal-ui:
+    image: temporalio/ui:2.28.0
+    container_name: rift-temporal-ui
+    ports:
+      - "8080:8080"
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CODEC_ENDPOINT: ""
+
+volumes:
+  mongo_data:
+  redis_data:

@@ -27,14 +27,14 @@
 
 **Purpose**: Project initialization, tooling, and local dev environment
 
-- [ ] T001 Create root project directory structure per plan.md (backend/, frontend/, cli/, helm/, docs/adr/, .github/workflows/)
-- [ ] T002 Initialize backend Python project with FastAPI, Pydantic, Motor, Temporal SDK dependencies in backend/pyproject.toml
-- [ ] T003 [P] Initialize frontend React 18 + TypeScript 5.x project with Vite, TanStack Query, React Router, Tailwind CSS 3.x, Vitest, Playwright in frontend/package.json; add Google Fonts link (Space Grotesk, Inter, Fira Code) and Material Symbols Outlined to frontend/index.html
-- [ ] T004 [P] Create `frontend/src/theme/tailwind.config.ts` — extend Tailwind with all Kinetic Monolith design tokens: full color map (background, surface-container-*, primary-container, tertiary, secondary-fixed, etc.), fontFamily (headline→Space Grotesk, body/label→Inter, mono→Fira Code), borderRadius scale (DEFAULT 1rem, lg 2rem, xl 3rem, full 9999px), and `kinetic-gradient` radial-gradient plugin; mirrors `docs/design/DESIGN.md` exactly
-- [ ] T005 [P] Initialize CLI TypeScript project with commander and node-fetch in cli/package.json
-- [ ] T006 [P] Create Docker Compose file for MongoDB, Redis, and Temporal dev server in docker-compose.yml
-- [ ] T007 [P] Create environment variable template with all required config vars in .env.example
-- [ ] T008 [P] Create root Makefile with lint, test, format, and dev start commands in Makefile
+- [x] T001 Create root project directory structure per plan.md (backend/, frontend/, cli/, helm/, docs/adr/, .github/workflows/)
+- [x] T002 Initialize backend Python project with FastAPI, Pydantic, Motor, Temporal SDK dependencies in backend/pyproject.toml
+- [x] T003 [P] Initialize frontend React 18 + TypeScript 5.x project with Vite, TanStack Query, React Router, Tailwind CSS 3.x, Vitest, Playwright in frontend/package.json; add Google Fonts link (Space Grotesk, Inter, Fira Code) and Material Symbols Outlined to frontend/index.html
+- [x] T004 [P] Create `frontend/src/theme/tailwind.config.ts` — extend Tailwind with all Kinetic Monolith design tokens: full color map (background, surface-container-*, primary-container, tertiary, secondary-fixed, etc.), fontFamily (headline→Space Grotesk, body/label→Inter, mono→Fira Code), borderRadius scale (DEFAULT 1rem, lg 2rem, xl 3rem, full 9999px), and `kinetic-gradient` radial-gradient plugin; mirrors `docs/design/DESIGN.md` exactly
+- [x] T005 [P] Initialize CLI TypeScript project with commander and node-fetch in cli/package.json
+- [x] T006 [P] Create Docker Compose file for MongoDB, Redis, and Temporal dev server in docker-compose.yml
+- [x] T007 [P] Create environment variable template with all required config vars in .env.example
+- [x] T008 [P] Create root Makefile with lint, test, format, and dev start commands in Makefile
 
 ---
 
@@ -46,54 +46,54 @@
 
 ### Backend Core
 
-- [ ] T008 Implement application config module with Pydantic Settings model in backend/src/core/config.py
-- [ ] T009 [P] Implement structured logging with correlation ID injection in backend/src/core/logging.py
-- [ ] T010 [P] Implement domain error types and FastAPI exception handlers in backend/src/core/errors.py
-- [ ] T011 Implement async MongoDB connection manager using Motor in backend/src/adapters/mongo/client.py
-- [ ] T012 [P] Implement async Redis connection manager in backend/src/adapters/redis/client.py
+- [x] T008 Implement application config module with Pydantic Settings model in backend/src/core/config.py
+- [x] T009 [P] Implement structured logging with correlation ID injection in backend/src/core/logging.py
+- [x] T010 [P] Implement domain error types and FastAPI exception handlers in backend/src/core/errors.py
+- [x] T011 Implement async MongoDB connection manager using Motor in backend/src/adapters/mongo/client.py
+- [x] T012 [P] Implement async Redis connection manager in backend/src/adapters/redis/client.py
 
 ### Backend Shared Models
 
-- [ ] T013 [P] Implement shared Pydantic schemas (pagination, cursor, error response, common enums) in backend/src/models/common.py
-- [ ] T014 Implement User domain model in backend/src/models/user.py
-- [ ] T015 [P] Implement Organization domain model in backend/src/models/organization.py
-- [ ] T016 Implement Namespace domain model (USER/ORG kind, visibility policy) in backend/src/models/namespace.py
-- [ ] T017 [P] Implement CodeHost domain model (GITHUB, GITLAB, BITBUCKET_SERVER, BITBUCKET_CLOUD, GERRIT) in backend/src/models/code_host.py
-- [ ] T018 [P] Implement Repository domain model in backend/src/models/repository.py
+- [x] T013 [P] Implement shared Pydantic schemas (pagination, cursor, error response, common enums) in backend/src/models/common.py
+- [x] T014 Implement User domain model in backend/src/models/user.py
+- [x] T015 [P] Implement Organization domain model in backend/src/models/organization.py
+- [x] T016 Implement Namespace domain model (USER/ORG kind, visibility policy) in backend/src/models/namespace.py
+- [x] T017 [P] Implement CodeHost domain model (GITHUB, GITLAB, BITBUCKET_SERVER, BITBUCKET_CLOUD, GERRIT) in backend/src/models/code_host.py
+- [x] T018 [P] Implement Repository domain model in backend/src/models/repository.py
 
 ### Backend Data Access & Middleware
 
-- [ ] T019 Implement base MongoDB repository pattern with optimistic concurrency in backend/src/adapters/mongo/base_repository.py
-- [ ] T020 Implement auth middleware with JWT/token validation in backend/src/api/middleware/auth.py
-- [ ] T021 [P] Implement redaction middleware for repository access checks in backend/src/api/middleware/redaction.py
-- [ ] T022 Implement FastAPI dependency injection (db, redis, current user, namespace) in backend/src/api/dependencies.py
-- [ ] T023 Create FastAPI app entrypoint with CORS, middleware, and router registration in backend/src/main.py
+- [x] T019 Implement base MongoDB repository pattern with optimistic concurrency in backend/src/adapters/mongo/base_repository.py
+- [x] T020 Implement auth middleware with JWT/token validation in backend/src/api/middleware/auth.py
+- [x] T021 [P] Implement redaction middleware for repository access checks in backend/src/api/middleware/redaction.py
+- [x] T022 Implement FastAPI dependency injection (db, redis, current user, namespace) in backend/src/api/dependencies.py
+- [x] T023 Create FastAPI app entrypoint with CORS, middleware, and router registration in backend/src/main.py
 
 ### Backend External Adapters
 
-- [ ] T024 [P] Implement S3-compatible object storage adapter for logs and patches in backend/src/adapters/object_store/s3_adapter.py
-- [ ] T025 Implement CodeHostAdapter base interface (Strategy pattern) in backend/src/adapters/code_hosts/base.py
-- [ ] T026 Implement GitHub code host adapter in backend/src/adapters/code_hosts/github.py
-- [ ] T027 [P] Implement GitLab code host adapter in backend/src/adapters/code_hosts/gitlab.py
-- [ ] T028 Setup Temporal worker entrypoint and task queue config in backend/src/workflows/worker.py
+- [x] T024 [P] Implement S3-compatible object storage adapter for logs and patches in backend/src/adapters/object_store/s3_adapter.py
+- [x] T025 Implement CodeHostAdapter base interface (Strategy pattern) in backend/src/adapters/code_hosts/base.py
+- [x] T026 Implement GitHub code host adapter in backend/src/adapters/code_hosts/github.py
+- [x] T027 [P] Implement GitLab code host adapter in backend/src/adapters/code_hosts/gitlab.py
+- [x] T028 Setup Temporal worker entrypoint and task queue config in backend/src/workflows/worker.py
 
 ### Frontend Foundation
 
-- [ ] T029 Create design-system primitive components in `frontend/src/components/ui/`:
+- [x] T029 Create design-system primitive components in `frontend/src/components/ui/`:
   - `Button.tsx` — Kinetic Pill: rounded-full, `kinetic-gradient` primary variant (bg radial #FF5543→#FFB4A9, text on-primary-container), ghost secondary variant (text primary, outline-variant border at 20%), `hover:scale-105 active:scale-95`, `hover:ring-4 hover:ring-primary-fixed` glow stroke
   - `TelemetryChip.tsx` — Fira Code 10px uppercase status badge; states: RUNNING (bg tertiary-container, text on-tertiary-container), FAILED (bg error-container, text on-error-container), OPEN/LIVE (bg primary-container, text on-primary-container), SYNCING (bg secondary-container, text secondary); rounded-full, no border
   - `IDECodePanel.tsx` — bg surface-container-lowest (#0E0E0E), 1px crosshatch dot pattern (24px spacing, outline-variant at 10% opacity), 4px scrollbar thumb (#353535), Fira Code; exports syntax class names: `.syntax-keyword` (tertiary), `.syntax-string` (#A5D6FF), `.syntax-key` (primary)
   - `Card.tsx` — bg secondary-fixed (#1A1A2E), sharp corners (borderRadius 0), hover bg #1F1F3D, optional `accent` prop adds `border-l-4 border-primary-container`; no divider lines (whitespace separation only)
   - `ProgressBar.tsx` — h-1 full-width track (bg surface-container-highest, rounded-full), fill div using `bg-primary-container` with `transition-all duration-1000`
   - `FrostedOverlay.tsx` — bg surface-container-high at 60% opacity, `backdrop-blur-xl`, `shadow-[0_0_64px_rgba(255,180,169,0.05)]` ambient glow; used for modals and command palette
-- [ ] T030 Create app-shell layout components in `frontend/src/components/layout/`:
+- [x] T030 Create app-shell layout components in `frontend/src/components/layout/`:
   - `TopAppBar.tsx` — fixed 64px header, bg #131313; left: RIFT wordmark (Space Grotesk ExtraBold, #FF5543, tracking-widest uppercase) + search input (rounded-full, bg surface-container-highest); right: Material Symbols Outlined icon buttons with `hover:text-primary active:scale-90`
   - `SideNav.tsx` — fixed 256px, bg #131313, **no border** (surface shift separates from content); nav items: Fira Code xs uppercase tracking-widest, active item: bg surface-container-low + `border-l-4 border-primary-container` + text primary-container; bottom: CREATE pill button (kinetic-gradient, rounded-full)
   - `ContentShell.tsx` — `<main>` wrapper with `ml-64 pt-16 bg-black min-h-screen`
-- [ ] T031 [P] Setup frontend app shell with React Router route stubs and `QueryClientProvider` wrapping `<ContentShell>` in frontend/src/App.tsx
-- [ ] T032 [P] Implement typed API client base with axios interceptors (auth header, 401 redirect) in frontend/src/services/api.ts
-- [ ] T033 [P] Implement auth context provider and useAuth hook in frontend/src/hooks/useAuth.ts
-- [ ] T034 [P] Create shared TypeScript type definitions from API contract in frontend/src/types/api.ts
+- [x] T031 [P] Setup frontend app shell with React Router route stubs and `QueryClientProvider` wrapping `<ContentShell>` in frontend/src/App.tsx
+- [x] T032 [P] Implement typed API client base with axios interceptors (auth header, 401 redirect) in frontend/src/services/api.ts
+- [x] T033 [P] Implement auth context provider and useAuth hook in frontend/src/hooks/useAuth.ts
+- [x] T034 [P] Create shared TypeScript type definitions from API contract in frontend/src/types/api.ts
 
 **Checkpoint**: Foundation ready — user story implementation can now begin in parallel
 
@@ -109,41 +109,41 @@
 
 ### Backend Models
 
-- [ ] T033 [P] [US1] Implement BatchChange domain model with state machine (DRAFT→PREVIEW_RUNNING→PREVIEW_READY→APPLYING→ACTIVE→PAUSED→ARCHIVED→FAILED) in backend/src/models/batch_change.py
-- [ ] T034 [P] [US1] Implement BatchSpec domain model with YAML hash dedup in backend/src/models/batch_spec.py
-- [ ] T035 [P] [US1] Implement BatchRun, WorkspaceExecution, and ExecutionStep models in backend/src/models/execution.py
+- [x] T033 [P] [US1] Implement BatchChange domain model with state machine (DRAFT→PREVIEW_RUNNING→PREVIEW_READY→APPLYING→ACTIVE→PAUSED→ARCHIVED→FAILED) in backend/src/models/batch_change.py
+- [x] T034 [P] [US1] Implement BatchSpec domain model with YAML hash dedup in backend/src/models/batch_spec.py
+- [x] T035 [P] [US1] Implement BatchRun, WorkspaceExecution, and ExecutionStep models in backend/src/models/execution.py
 
 ### Backend Data Access
 
-- [ ] T036 [US1] Implement BatchChange MongoDB repository with state filter queries in backend/src/adapters/mongo/batch_change_repo.py
-- [ ] T037 [P] [US1] Implement BatchSpec MongoDB repository in backend/src/adapters/mongo/batch_spec_repo.py
-- [ ] T038 [P] [US1] Implement BatchRun MongoDB repository in backend/src/adapters/mongo/batch_run_repo.py
-- [ ] T039 [P] [US1] Implement WorkspaceExecution MongoDB repository with batch_run index in backend/src/adapters/mongo/workspace_execution_repo.py
+- [x] T036 [US1] Implement BatchChange MongoDB repository with state filter queries in backend/src/adapters/mongo/batch_change_repo.py
+- [x] T037 [P] [US1] Implement BatchSpec MongoDB repository in backend/src/adapters/mongo/batch_spec_repo.py
+- [x] T038 [P] [US1] Implement BatchRun MongoDB repository in backend/src/adapters/mongo/batch_run_repo.py
+- [x] T039 [P] [US1] Implement WorkspaceExecution MongoDB repository with batch_run index in backend/src/adapters/mongo/workspace_execution_repo.py
 
 ### Backend Services
 
-- [ ] T040 [US1] Implement BatchChangeService (create, update spec, close, archive, state transitions) in backend/src/services/batch_change_service.py
-- [ ] T041 [US1] Implement ExecutionOrchestrator (trigger preview/apply, coordinate fan-out, aggregate results) in backend/src/services/execution_orchestrator.py
+- [x] T040 [US1] Implement BatchChangeService (create, update spec, close, archive, state transitions) in backend/src/services/batch_change_service.py
+- [x] T041 [US1] Implement ExecutionOrchestrator (trigger preview/apply, coordinate fan-out, aggregate results) in backend/src/services/execution_orchestrator.py
 
 ### Backend Workflows
 
-- [ ] T042 [US1] Implement preview Temporal workflow with fan-out workspace execution and fan-in result aggregation in backend/src/workflows/preview_workflow.py
-- [ ] T043 [US1] Implement apply Temporal workflow (finalize batch change, produce changeset specs) in backend/src/workflows/apply_workflow.py
-- [ ] T044 [P] [US1] Implement workspace runner Temporal activities (clone, execute steps, capture diffs) in backend/src/workflows/activities/workspace_runner.py
+- [x] T042 [US1] Implement preview Temporal workflow with fan-out workspace execution and fan-in result aggregation in backend/src/workflows/preview_workflow.py
+- [x] T043 [US1] Implement apply Temporal workflow (finalize batch change, produce changeset specs) in backend/src/workflows/apply_workflow.py
+- [x] T044 [P] [US1] Implement workspace runner Temporal activities (clone, execute steps, capture diffs) in backend/src/workflows/activities/workspace_runner.py
 
 ### Backend API Routes
 
-- [ ] T045 [US1] Implement batch-changes API routes (list, create, get, update spec, preview, apply, close, archive) in backend/src/api/routes/batch_changes.py
-- [ ] T046 [US1] Implement batch-runs API routes (get detail, exclude workspace) in backend/src/api/routes/batch_runs.py
-- [ ] T047 [US1] Implement SSE stream endpoint for live batch run updates in backend/src/api/routes/streams.py
+- [x] T045 [US1] Implement batch-changes API routes (list, create, get, update spec, preview, apply, close, archive) in backend/src/api/routes/batch_changes.py
+- [x] T046 [US1] Implement batch-runs API routes (get detail, exclude workspace) in backend/src/api/routes/batch_runs.py
+- [x] T047 [US1] Implement SSE stream endpoint for live batch run updates in backend/src/api/routes/streams.py
 
 ### Frontend Pages
 
-- [ ] T048 [P] [US1] Create `BatchChangesList` page in `frontend/src/pages/BatchChangesList/index.tsx` — hero section: Space Grotesk 7xl ExtraBold heading ("Batch\nOperations" with primary-container span) + secondary-fixed impact-telemetry card (Fira Code meta label + ExtraBold stat); filter toggle pill group (rounded-full, surface-container-lowest bg); batch change `<Card>` grid using `<TelemetryChip>` for status + `<ProgressBar>` for running items; CREATE kinetic-gradient pill CTA
-- [ ] T049 [P] [US1] Create `BatchChangeCreate` page in `frontend/src/pages/BatchChangeCreate/index.tsx` — name and description form fields (sharp-corner inputs, on-surface-variant labels), namespace selector; "Start from scratch" tile; submit → navigate to BatchSpecEditor; integrates template selector (US5 hook point)
-- [ ] T050 [US1] Create `BatchSpecEditor` page in `frontend/src/pages/BatchSpecEditor/index.tsx` — IDE split-pane: left 65% `<IDECodePanel>` YAML editor with `.syntax-keyword`/`.syntax-key`/`.syntax-string` highlighting; right 35% preview panel (surface-container bg, resolved repo list); workspace exclusion checkboxes; "Run batch spec" `<Button variant="primary">` CTA
-- [ ] T051 [US1] Create `ExecutionView` page in `frontend/src/pages/ExecutionView/index.tsx` — workspace execution list (each row: repo name + `<TelemetryChip>` state + duration in Fira Code); expandable `<IDECodePanel>` log stream per workspace; SSE consumer via `useExecutionStream`; step diff viewer panel
-- [ ] T052 [US1] Implement `useExecutionStream` SSE hook in `frontend/src/hooks/useExecutionStream.ts` — creates EventSource to `/batch-changes/{id}/runs/{runId}/stream`, updates TanStack Query cache with workspace execution events
+- [x] T048 [P] [US1] Create `BatchChangesList` page in `frontend/src/pages/BatchChangesList/index.tsx` — hero section: Space Grotesk 7xl ExtraBold heading ("Batch\nOperations" with primary-container span) + secondary-fixed impact-telemetry card (Fira Code meta label + ExtraBold stat); filter toggle pill group (rounded-full, surface-container-lowest bg); batch change `<Card>` grid using `<TelemetryChip>` for status + `<ProgressBar>` for running items; CREATE kinetic-gradient pill CTA
+- [x] T049 [P] [US1] Create `BatchChangeCreate` page in `frontend/src/pages/BatchChangeCreate/index.tsx` — name and description form fields (sharp-corner inputs, on-surface-variant labels), namespace selector; "Start from scratch" tile; submit → navigate to BatchSpecEditor; integrates template selector (US5 hook point)
+- [x] T050 [US1] Create `BatchSpecEditor` page in `frontend/src/pages/BatchSpecEditor/index.tsx` — IDE split-pane: left 65% `<IDECodePanel>` YAML editor with `.syntax-keyword`/`.syntax-key`/`.syntax-string` highlighting; right 35% preview panel (surface-container bg, resolved repo list); workspace exclusion checkboxes; "Run batch spec" `<Button variant="primary">` CTA
+- [x] T051 [US1] Create `ExecutionView` page in `frontend/src/pages/ExecutionView/index.tsx` — workspace execution list (each row: repo name + `<TelemetryChip>` state + duration in Fira Code); expandable `<IDECodePanel>` log stream per workspace; SSE consumer via `useExecutionStream`; step diff viewer panel
+- [x] T052 [US1] Implement `useExecutionStream` SSE hook in `frontend/src/hooks/useExecutionStream.ts` — creates EventSource to `/batch-changes/{id}/runs/{runId}/stream`, updates TanStack Query cache with workspace execution events
 
 **Checkpoint**: User Story 1 is fully functional — users can create, preview, and apply batch changes via the web UI
 
@@ -159,32 +159,32 @@
 
 ### Backend Models
 
-- [ ] T053 [P] [US2] Implement ChangesetSpec domain model with state machine (UNPUBLISHED→PUBLISHING→PUBLISHED→MERGED/CLOSED/ARCHIVED) in backend/src/models/changeset_spec.py
-- [ ] T054 [P] [US2] Implement Changeset and ChangesetEvent domain models in backend/src/models/changeset.py
-- [ ] T055 [P] [US2] Implement BatchChangeStats and BurndownDaily read models in backend/src/models/analytics.py
+- [x] T053 [P] [US2] Implement ChangesetSpec domain model with state machine (UNPUBLISHED→PUBLISHING→PUBLISHED→MERGED/CLOSED/ARCHIVED) in backend/src/models/changeset_spec.py
+- [x] T054 [P] [US2] Implement Changeset and ChangesetEvent domain models in backend/src/models/changeset.py
+- [x] T055 [P] [US2] Implement BatchChangeStats and BurndownDaily read models in backend/src/models/analytics.py
 
 ### Backend Data Access
 
-- [ ] T056 [US2] Implement ChangesetSpec MongoDB repository with batch_change + repo compound index in backend/src/adapters/mongo/changeset_spec_repo.py
-- [ ] T057 [P] [US2] Implement Changeset MongoDB repository with state/review/check filter queries in backend/src/adapters/mongo/changeset_repo.py
-- [ ] T058 [P] [US2] Implement ChangesetEvent MongoDB repository in backend/src/adapters/mongo/changeset_event_repo.py
+- [x] T056 [US2] Implement ChangesetSpec MongoDB repository with batch_change + repo compound index in backend/src/adapters/mongo/changeset_spec_repo.py
+- [x] T057 [P] [US2] Implement Changeset MongoDB repository with state/review/check filter queries in backend/src/adapters/mongo/changeset_repo.py
+- [x] T058 [P] [US2] Implement ChangesetEvent MongoDB repository in backend/src/adapters/mongo/changeset_event_repo.py
 
 ### Backend Services
 
-- [ ] T059 [US2] Implement ChangesetController service (publish, bulk close/archive, status sync from code host) in backend/src/services/changeset_controller.py
-- [ ] T060 [US2] Implement reconciliation loop service (desired-state convergence using spec fingerprints) in backend/src/services/reconciliation_service.py
-- [ ] T061 [US2] Implement code host webhook receiver (CI, review, merge events) in backend/src/api/routes/webhooks.py
-- [ ] T062 [US2] Implement AnalyticsService (stats projection rebuild, daily burndown computation) in backend/src/services/analytics_service.py
+- [x] T059 [US2] Implement ChangesetController service (publish, bulk close/archive, status sync from code host) in backend/src/services/changeset_controller.py
+- [x] T060 [US2] Implement reconciliation loop service (desired-state convergence using spec fingerprints) in backend/src/services/reconciliation_service.py
+- [x] T061 [US2] Implement code host webhook receiver (CI, review, merge events) in backend/src/api/routes/webhooks.py
+- [x] T062 [US2] Implement AnalyticsService (stats projection rebuild, daily burndown computation) in backend/src/services/analytics_service.py
 
 ### Backend API Routes
 
-- [ ] T063 [US2] Implement changesets API routes (list with filters, publish, stats, burndown) in backend/src/api/routes/changesets.py
+- [x] T063 [US2] Implement changesets API routes (list with filters, publish, stats, burndown) in backend/src/api/routes/changesets.py
 
 ### Frontend Pages
 
-- [ ] T064 [US2] Create `ChangesetDashboard` page in `frontend/src/pages/ChangesetDashboard/index.tsx` — filter rail (state/review/CI dropdowns as ghost `<Button>` pills); changeset table rows (alternate bg between surface-container-low and surface-container-lowest, `outline-variant` at 15% opacity ghost row borders, `<TelemetryChip>` for publication/CI/review state columns, external PR link in Fira Code); bulk-select checkboxes
-- [ ] T065 [US2] Add `<BurndownChart>` component to ChangesetDashboard in `frontend/src/components/BurndownChart.tsx` — SVG line chart of merged changesets over time; fill color `primary-container`, axis labels in Fira Code mono, bg surface-container-lowest; `<ProgressBar>` summary strip at top showing % merged
-- [ ] T066 [US2] Implement `<ChangesetBulkActions>` component in `frontend/src/components/ChangesetBulkActions.tsx` — kinetic-gradient "Publish" pill CTA, publish-mode dropdown (Full PR / Draft PR / Push only) as ghost button group, confirm action; uses `FrostedOverlay` for confirmation modal
+- [x] T064 [US2] Create `ChangesetDashboard` page in `frontend/src/pages/ChangesetDashboard/index.tsx` — filter rail (state/review/CI dropdowns as ghost `<Button>` pills); changeset table rows (alternate bg between surface-container-low and surface-container-lowest, `outline-variant` at 15% opacity ghost row borders, `<TelemetryChip>` for publication/CI/review state columns, external PR link in Fira Code); bulk-select checkboxes
+- [x] T065 [US2] Add `<BurndownChart>` component to ChangesetDashboard in `frontend/src/components/BurndownChart.tsx` — SVG line chart of merged changesets over time; fill color `primary-container`, axis labels in Fira Code mono, bg surface-container-lowest; `<ProgressBar>` summary strip at top showing % merged
+- [x] T066 [US2] Implement `<ChangesetBulkActions>` component in `frontend/src/components/ChangesetBulkActions.tsx` — kinetic-gradient "Publish" pill CTA, publish-mode dropdown (Full PR / Draft PR / Push only) as ghost button group, confirm action; uses `FrostedOverlay` for confirmation modal
 
 **Checkpoint**: User Stories 1 AND 2 are complete — the full core loop (create → execute → apply → publish → track) works end-to-end
 
@@ -198,11 +198,11 @@
 
 **FRs**: FR-006 (CLI preview/apply), FR-026 (--skip-errors)
 
-- [ ] T067 [US3] Implement CLI API client with auth token storage and refresh in cli/src/client/api.ts
-- [ ] T068 [US3] Implement login command with token persistence in cli/src/commands/login.ts
-- [ ] T069 [US3] Implement batch preview command (resolve repos, compute diffs, print preview URL) in cli/src/commands/batch-preview.ts
-- [ ] T070 [US3] Implement batch apply command with --skip-errors and --namespace flags in cli/src/commands/batch-apply.ts
-- [ ] T071 [US3] Create CLI entry point with commander argument parser in cli/src/index.ts
+- [x] T067 [US3] Implement CLI API client with auth token storage and refresh in cli/src/client/api.ts
+- [x] T068 [US3] Implement login command with token persistence in cli/src/commands/login.ts
+- [x] T069 [US3] Implement batch preview command (resolve repos, compute diffs, print preview URL) in cli/src/commands/batch-preview.ts
+- [x] T070 [US3] Implement batch apply command with --skip-errors and --namespace flags in cli/src/commands/batch-apply.ts
+- [x] T071 [US3] Create CLI entry point with commander argument parser in cli/src/index.ts
 
 **Checkpoint**: User Story 3 is functional — CLI users can preview and apply batch changes
 
@@ -216,12 +216,12 @@
 
 **FRs**: FR-019 (credential storage), FR-020 (namespace-based access), FR-021 (redaction)
 
-- [ ] T072 [P] [US4] Implement Credential domain model with encryption fields in backend/src/models/credential.py
-- [ ] T073 [US4] Implement KMS envelope encryption module (encrypt, decrypt, key rotation) in backend/src/core/encryption.py
-- [ ] T074 [US4] Implement CredentialService (CRUD, scope resolution per namespace/user/global) in backend/src/services/credential_service.py
-- [ ] T075 [US4] Implement credentials API routes (list, create, delete) with token redaction in backend/src/api/routes/credentials.py
-- [ ] T076 [US4] Enforce namespace-scoped access control rules in auth middleware in backend/src/api/middleware/auth.py
-- [ ] T077 [US4] Create `CredentialSettings` page in `frontend/src/pages/CredentialSettings/index.tsx` — credential list using `<Card>` components (code host kind `<TelemetryChip>`, scope badge GLOBAL/ORG/USER in Fira Code, token ID in Fira Code mono, delete button ghost pill); add-credential form with code host selector and token input (sharp-corner, on-surface-variant labels); `<FrostedOverlay>` confirmation modal on delete
+- [x] T072 [P] [US4] Implement Credential domain model with encryption fields in backend/src/models/credential.py
+- [x] T073 [US4] Implement KMS envelope encryption module (encrypt, decrypt, key rotation) in backend/src/core/encryption.py
+- [x] T074 [US4] Implement CredentialService (CRUD, scope resolution per namespace/user/global) in backend/src/services/credential_service.py
+- [x] T075 [US4] Implement credentials API routes (list, create, delete) with token redaction in backend/src/api/routes/credentials.py
+- [x] T076 [US4] Enforce namespace-scoped access control rules in auth middleware in backend/src/api/middleware/auth.py
+- [x] T077 [US4] Create `CredentialSettings` page in `frontend/src/pages/CredentialSettings/index.tsx` — credential list using `<Card>` components (code host kind `<TelemetryChip>`, scope badge GLOBAL/ORG/USER in Fira Code, token ID in Fira Code mono, delete button ghost pill); add-credential form with code host selector and token input (sharp-corner, on-surface-variant labels); `<FrostedOverlay>` confirmation modal on delete
 
 **Checkpoint**: User Story 4 is functional — credentials and RBAC are enforced
 
@@ -235,11 +235,11 @@
 
 **FRs**: FR-023 (template library with regex validation)
 
-- [ ] T078 [P] [US5] Implement Template domain model with form schema and validation rules in backend/src/models/template.py
-- [ ] T079 [US5] Implement TemplateService with YAML parameter substitution and validation in backend/src/services/template_service.py
-- [ ] T080 [US5] Implement templates API routes (list, create) in backend/src/api/routes/templates.py
-- [ ] T081 [US5] Add template library selection screen to `BatchChangeCreate` in `frontend/src/pages/BatchChangeCreate/TemplateSelector.tsx` — grid of `<Card>` tiles (template name as Space Grotesk headline, description in Inter body, category `<TelemetryChip>`), "Start from scratch" tile with ghost `<Button>`; selected template navigates to form step
-- [ ] T082 [US5] Implement `<TemplateForm>` in `frontend/src/pages/BatchChangeCreate/TemplateForm.tsx` — dynamic fields rendered from `form_schema`; sharp-corner input fields, Fira Code labels, inline error messages in `error` color; final submit triggers batch spec generation via API then navigates to BatchSpecEditor
+- [x] T078 [P] [US5] Implement Template domain model with form schema and validation rules in backend/src/models/template.py
+- [x] T079 [US5] Implement TemplateService with YAML parameter substitution and validation in backend/src/services/template_service.py
+- [x] T080 [US5] Implement templates API routes (list, create) in backend/src/api/routes/templates.py
+- [x] T081 [US5] Add template library selection screen to `BatchChangeCreate` in `frontend/src/pages/BatchChangeCreate/TemplateSelector.tsx` — grid of `<Card>` tiles (template name as Space Grotesk headline, description in Inter body, category `<TelemetryChip>`), "Start from scratch" tile with ghost `<Button>`; selected template navigates to form step
+- [x] T082 [US5] Implement `<TemplateForm>` in `frontend/src/pages/BatchChangeCreate/TemplateForm.tsx` — dynamic fields rendered from `form_schema`; sharp-corner input fields, Fira Code labels, inline error messages in `error` color; final submit triggers batch spec generation via API then navigates to BatchSpecEditor
 
 **Checkpoint**: User Story 5 is functional — template-driven batch change creation works
 
@@ -253,9 +253,9 @@
 
 **FRs**: FR-024 (import external changesets)
 
-- [ ] T083 [US6] Implement changeset import logic (resolve external URLs, create tracking records) in backend/src/services/changeset_controller.py
-- [ ] T084 [US6] Implement import changesets API route in backend/src/api/routes/changesets.py
-- [ ] T085 [US6] Add changeset import UI to ChangesetDashboard in `frontend/src/pages/ChangesetDashboard/ImportChangesets.tsx` — "Import changesets" ghost `<Button>` opens `<FrostedOverlay>` modal with `<IDECodePanel>` textarea for PR URLs (one per line), submit calls import API, success shows imported count `<TelemetryChip>`
+- [x] T083 [US6] Implement changeset import logic (resolve external URLs, create tracking records) in backend/src/services/changeset_controller.py
+- [x] T084 [US6] Implement import changesets API route in backend/src/api/routes/changesets.py
+- [x] T085 [US6] Add changeset import UI to ChangesetDashboard in `frontend/src/pages/ChangesetDashboard/ImportChangesets.tsx` — "Import changesets" ghost `<Button>` opens `<FrostedOverlay>` modal with `<IDECodePanel>` textarea for PR URLs (one per line), submit calls import API, success shows imported count `<TelemetryChip>`
 
 **Checkpoint**: User Story 6 is functional — external changesets are tracked alongside Rift-created ones
 
@@ -267,27 +267,27 @@
 
 ### Audit Infrastructure
 
-- [ ] T086 [P] Implement AuditEvent model and MongoDB repository in backend/src/models/audit.py
-- [ ] T087 Implement audit logging service (intercept state changes across all resources) in backend/src/services/audit_service.py
-- [ ] T088 Implement audit-events API route (list with filters) in backend/src/api/routes/audit.py
+- [x] T086 [P] Implement AuditEvent model and MongoDB repository in backend/src/models/audit.py
+- [x] T087 Implement audit logging service (intercept state changes across all resources) in backend/src/services/audit_service.py
+- [x] T088 Implement audit-events API route (list with filters) in backend/src/api/routes/audit.py
 
 ### CI/CD & Deployment
 
-- [ ] T089 [P] Create CI backend workflow (lint, test, coverage ≥80% gate) in .github/workflows/ci-backend.yml
-- [ ] T090 [P] Create CI frontend workflow (lint, test, coverage gate) in .github/workflows/ci-frontend.yml
-- [ ] T091 [P] Create Helm umbrella chart with subcharts (frontend, api, workers, runners, ingress) in helm/Chart.yaml
+- [x] T089 [P] Create CI backend workflow (lint, test, coverage ≥80% gate) in .github/workflows/ci-backend.yml
+- [x] T090 [P] Create CI frontend workflow (lint, test, coverage gate) in .github/workflows/ci-frontend.yml
+- [x] T091 [P] Create Helm umbrella chart with subcharts (frontend, api, workers, runners, ingress) in helm/Chart.yaml
 
 ### Documentation
 
-- [ ] T092 Update project README with architecture overview, setup, testing, and contribution guide in README.md
-- [ ] T093 Create ADR for MongoDB as primary data store in docs/adr/adr-001-mongodb-primary-store.md
-- [ ] T094 [P] Create ADR for Temporal workflow orchestration in docs/adr/adr-002-temporal-orchestration.md
-- [ ] T095 [P] Create ADR for REST+SSE API style over GraphQL in docs/adr/adr-003-rest-sse-api-style.md
+- [x] T092 Update project README with architecture overview, setup, testing, and contribution guide in README.md
+- [x] T093 Create ADR for MongoDB as primary data store in docs/adr/adr-001-mongodb-primary-store.md
+- [x] T094 [P] Create ADR for Temporal workflow orchestration in docs/adr/adr-002-temporal-orchestration.md
+- [x] T095 [P] Create ADR for REST+SSE API style over GraphQL in docs/adr/adr-003-rest-sse-api-style.md
 
 ### Validation
 
-- [ ] T096 Run quickstart.md end-to-end validation (full local dev setup and smoke test)
-- [ ] T097 [P] Create ADR for Kinetic Monolith design system and Tailwind CSS token architecture in `docs/adr/adr-006-design-system-kinetic-monolith.md`
+- [x] T096 Run quickstart.md end-to-end validation (full local dev setup and smoke test)
+- [x] T097 [P] Create ADR for Kinetic Monolith design system and Tailwind CSS token architecture in `docs/adr/adr-006-design-system-kinetic-monolith.md`
 
 ---
 

@@ -1,0 +1,69 @@
+# Global values shared across all subcharts
+global:
+  image:
+    registry: ghcr.io
+    repository: your-org/rift
+    tag: latest
+    pullPolicy: IfNotPresent
+
+# API service
+api:
+  replicaCount: 2
+  image:
+    name: rift-api
+  service:
+    port: 8000
+  env:
+    MONGODB_URL: "mongodb://mongodb:27017/rift"
+    REDIS_URL: "redis://redis:6379/0"
+    TEMPORAL_HOST: "temporal-frontend:7233"
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+
+# Temporal workflow worker
+worker:
+  replicaCount: 2
+  image:
+    name: rift-worker
+  env:
+    TEMPORAL_HOST: "temporal-frontend:7233"
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "2000m"
+      memory: "2Gi"
+
+# Frontend SPA (served via nginx)
+frontend:
+  replicaCount: 1
+  image:
+    name: rift-frontend
+  service:
+    port: 80
+
+# Ingress
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: rift.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+          service: api
+        - path: /
+          pathType: Prefix
+          service: frontend
+  tls:
+    - secretName: rift-tls
+      hosts:
+        - rift.example.com

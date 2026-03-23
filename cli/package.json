@@ -1,0 +1,28 @@
+{
+  "name": "rift-cli",
+  "version": "0.1.0",
+  "description": "Rift Batch Changes CLI",
+  "bin": {
+    "rift": "./dist/index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node --esm src/index.ts",
+    "test": "vitest",
+    "lint": "eslint . --ext ts"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0",
+    "ts-node": "^10.9.2",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "eslint": "^8.57.0"
+  }
+}
