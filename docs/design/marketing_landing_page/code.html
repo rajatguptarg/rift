@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RIFT | Automate Large-Scale Code Changes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&amp;family=Inter:wght@300;400;500;600;700&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#131313",
+                        "inverse-on-surface": "#303030",
+                        "on-error-container": "#ffdad6",
+                        "outline": "#aa8984",
+                        "surface-container-high": "#2a2a2a",
+                        "error": "#ffb4ab",
+                        "primary-container": "#ff5543",
+                        "on-primary-container": "#5c0001",
+                        "inverse-primary": "#b72117",
+                        "primary-fixed-dim": "#ffb4a9",
+                        "surface": "#131313",
+                        "on-primary-fixed-variant": "#930002",
+                        "on-secondary": "#2f2e43",
+                        "on-primary": "#690001",
+                        "tertiary": "#45d8ed",
+                        "secondary-container": "#47475d",
+                        "error-container": "#93000a",
+                        "tertiary-fixed-dim": "#45d8ed",
+                        "secondary-fixed": "#e2e0fc",
+                        "secondary-fixed-dim": "#c6c4df",
+                        "on-error": "#690005",
+                        "secondary": "#c6c4df",
+                        "on-tertiary-container": "#002f35",
+                        "on-tertiary-fixed-variant": "#004f58",
+                        "on-secondary-fixed-variant": "#45455b",
+                        "surface-bright": "#393939",
+                        "on-background": "#e2e2e2",
+                        "on-tertiary": "#00363d",
+                        "on-secondary-container": "#b8b6d0",
+                        "primary": "#ffb4a9",
+                        "surface-container-highest": "#353535",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed": "#98f0ff",
+                        "on-tertiary-fixed": "#001f24",
+                        "on-secondary-fixed": "#1a1a2e",
+                        "surface-tint": "#ffb4a9",
+                        "outline-variant": "#5b403c",
+                        "surface-container-low": "#1b1b1b",
+                        "inverse-surface": "#e2e2e2",
+                        "on-surface-variant": "#e4beb8",
+                        "surface-variant": "#353535",
+                        "on-surface": "#e2e2e2",
+                        "tertiary-container": "#00a0b1",
+                        "surface-container": "#1f1f1f",
+                        "primary-fixed": "#ffdad5",
+                        "on-primary-fixed": "#410000",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["Fira Code"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .kinetic-gradient {
+            background: radial-gradient(circle at center, #ff5543 0%, #ffb4a9 100%);
+        }
+        .frosted-obsidian {
+            background: rgba(42, 42, 42, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .code-grid {
+            background-image: radial-gradient(#5b403c 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-[#131313]">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black text-[#FF5543] tracking-tighter font-headline uppercase">RIFT</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="font-headline font-extrabold uppercase tracking-widest text-xs text-[#FF5543] border-b-2 border-[#FF5543] py-1 transition-colors" href="#">Batch Changes</a>
+<a class="font-headline font-extrabold uppercase tracking-widest text-xs text-gray-500 hover:text-[#FFB4A9] transition-colors" href="#">Search</a>
+<a class="font-headline font-extrabold uppercase tracking-widest text-xs text-gray-500 hover:text-[#FFB4A9] transition-colors" href="#">Insights</a>
+<a class="font-headline font-extrabold uppercase tracking-widest text-xs text-gray-500 hover:text-[#FFB4A9] transition-colors" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center bg-surface-container-low px-3 py-1.5 rounded-full border border-outline-variant/20">
+<span class="material-symbols-outlined text-gray-500 text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-xs w-48 text-on-surface" placeholder="Search codebase..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors">sensors</button>
+<button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors">account_circle</button>
+</div>
+</header>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex flex-col items-start justify-center px-6 md:px-24 overflow-hidden bg-[#000000]">
+<div class="max-w-4xl z-10">
+<h1 class="font-headline font-extrabold text-5xl md:text-[80px] leading-[1.05] tracking-[0.05em] uppercase text-on-background mb-8">
+                    Automate large-scale <br/>code changes
+                </h1>
+<p class="text-xl md:text-2xl text-on-surface-variant max-w-2xl mb-12 font-light">
+                    Change code everywhere with a single declarative file. Modern engineering at industrial scale.
+                </p>
+<div class="flex flex-wrap gap-6 items-center">
+<button class="kinetic-gradient text-on-primary-container font-headline font-bold uppercase tracking-wider px-10 py-5 rounded-full hover:scale-105 active:scale-95 transition-transform">
+                        Schedule a demo
+                    </button>
+<button class="flex items-center gap-2 font-mono text-sm tracking-widest text-primary border border-outline-variant/20 px-8 py-5 rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-lg">play_circle</span>
+                        VIEW WORKFLOW
+                    </button>
+</div>
+</div>
+<!-- IDE Mockup Graphic -->
+<div class="mt-20 w-full max-w-6xl self-center relative">
+<div class="rounded-xl overflow-hidden border border-outline-variant/30 bg-surface-container-lowest shadow-2xl relative">
+<!-- Title Bar -->
+<div class="flex items-center justify-between px-4 py-2 bg-surface-container-low border-b border-outline-variant/20">
+<div class="flex gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-red-500/40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-yellow-500/40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-green-500/40"></div>
+</div>
+<div class="font-mono text-[10px] text-gray-500 tracking-widest uppercase">batch-spec.yaml — rift-core</div>
+<div class="w-12"></div>
+</div>
+<!-- IDE Content -->
+<div class="flex h-[400px]">
+<div class="w-12 border-r border-outline-variant/10 flex flex-col items-center py-4 gap-6">
+<span class="material-symbols-outlined text-primary text-xl">layers</span>
+<span class="material-symbols-outlined text-gray-600 text-xl">search</span>
+<span class="material-symbols-outlined text-gray-600 text-xl">account_tree</span>
+</div>
+<div class="flex-1 p-8 font-mono text-sm relative">
+<div class="code-grid absolute inset-0 pointer-events-none"></div>
+<div class="relative z-10 leading-relaxed">
+<p><span class="text-tertiary">name:</span> update-react-version</p>
+<p><span class="text-tertiary">description:</span> Bump react to v18.2 across all microservices</p>
+<p class="mt-4"><span class="text-tertiary">on:</span></p>
+<p class="ml-4"><span class="text-tertiary">repositoriesMatchingQuery:</span> <span class="text-green-400">"lang:typescript react &lt; 18"</span></p>
+<p class="mt-4"><span class="text-tertiary">steps:</span></p>
+<p class="ml-4">- <span class="text-tertiary">run:</span> npm install react@18.2.0 react-dom@18.2.0</p>
+<p class="ml-4"><span class="text-tertiary">container:</span> node:16</p>
+<p class="mt-4"><span class="text-tertiary">changesetTemplate:</span></p>
+<p class="ml-4"><span class="text-tertiary">title:</span> Upgrade React to v18.2</p>
+<p class="ml-4"><span class="text-tertiary">body:</span> Standardized security and performance update.</p>
+</div>
+</div>
+<!-- Pill Badge Overlay -->
+<div class="absolute right-12 bottom-12 flex items-center gap-3 bg-primary-container px-6 py-3 rounded-full shadow-[0_0_40px_rgba(255,85,67,0.3)] border border-primary/40">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">layers</span>
+<span class="font-headline font-extrabold uppercase tracking-widest text-xs text-on-primary-container">Batch Changes Active</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Trust Strip -->
+<section class="py-16 bg-surface border-y border-outline-variant/10">
+<div class="max-w-7xl mx-auto px-6">
+<p class="text-center font-mono text-[10px] tracking-[0.3em] uppercase text-gray-500 mb-10">Trusted by Global Infrastructure Teams</p>
+<div class="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale contrast-125">
+<img alt="Indeed Logo" class="h-6" data-alt="Indeed monochrome brand logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjSrXnZRkbThzyhjBguhJDlaZCxoeV0EM5-bNV0y6dnV2OjPzErtrd7-YFj33iYUJKCjDSu5sHUqoVHzCNc5KONzxL2ieeIT4yFvNggP1VDnt-5Y-cHoTd4wzgPWLhTdal032PPEvZe7SIM8Q-9K4LzSetbyh9MCIpLqgGP6XXavtC06L1aeOuPMECRnphDm1kMm4_HB7z2NGGZEFuxOId12DMB6HNclYbxhgt-7p_85EG3PvC-dLNWqBtCrIQoMyyF6n5_4q_2VoJ"/>
+<img alt="Dropbox Logo" class="h-6" data-alt="Dropbox monochrome brand logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzVxUnqdIgkfzoqNXM3p85mdI-R4i75RwiZhk7G9gKBlNDsEOwNQuSfltZVTqthCI5GbKUYOwx1rpxdWoqiyS_CYqqv6cTOZKLsYUwUVCPgONpahVZVTRcUb360g2YxlqAnwB14oiX-xbjVBohEoNo5DldFki4n4X9EKgh1r31Eb3s6EWACeC4Di_oD6-L-whGLCokIoZmvF2a1bqV9QhHtIEPIXSzSLATPlpt3mhKJ80K9WV0MVmuU8pIo8phzJpRxqucEDxSx3Gg"/>
+<img alt="Stripe Logo" class="h-6" data-alt="Stripe monochrome brand logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRj4g9bAtuqw7IO16UasGoaRYotNPaZDVxE3XDOpJpDwYaz19lE3QwXOztrAxC3TQp2DT17RqKx4Gj54AkuUdPekgk5X7n34AyuF7zkHW4ekHEor2NNxMT9rU3yFsbvoGDly5HBVqE1s-W-CHYAjU3d1qvw08yKvCrOlVi-QXcFtTXJirD_1kjvjgrAOKdZPp19zH3r05oM0laZXxRrYw-HmFcxBdkgoFarTeY5rCwQmiPPDtOQ6ia8KGkVbBqbrqTdXsID_2O5-DE"/>
+<img alt="Reddit Logo" class="h-6" data-alt="Reddit monochrome brand logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZQ74nLzNIqgL-yH8MgIu4DIETEPHkFocMYse4FLA9sb6ZHCXmLbsSzlvJMgbeh3WaD45Sx3lTC_B5S83z3ZY2h6Ydo83wBk_9mSPJ_Yp2_Z5r4qcYbzXTD-sClmmT-S1LTvcVvc-_s9faVJn4AmK_tUxM59OrYWEbhAtJUQrcJQig01LQ4t_JynAsEn7BECG-QcdSbKkycMFZLlaMIUntypeGf8W-_qiViB8A42xmUPC_t2_TteOoJp4FmdZdFeOXV5kk22izltlX"/>
+<img alt="Lyft Logo" class="h-6" data-alt="Lyft monochrome brand logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP2c7k273BRYZEf0861pX5eGGPoaFh-7TlFW9-kUI1Pe8bncLogWtX-lXNN8dJdobYcpDDwszSEP6LKZXbSGgCEudcfTnIkCJVAb842G-hB1ic113fHb91PlVaWF2OygGBOWz55hqpXP0e3OfGVk492Q4g3YJNRClaKgIU2SSMTmQ3411mNXoIKztOLID8-xiLZtj16eWq26_Oy79IqnJbOTp_rG1gbLVUufqnEsGn_e8AurOt9aLo1YigfGmavi-D7aM8cg_2_U_C"/>
+</div>
+</div>
+</section>
+<!-- The Burndown Stats Section -->
+<section class="py-24 px-6 md:px-24 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+<div class="max-w-xl">
+<span class="font-mono text-xs tracking-[0.4em] text-primary uppercase mb-4 block">LIVE TELEMETRY</span>
+<h2 class="font-headline font-extrabold text-4xl md:text-6xl tracking-tight uppercase">The Burndown</h2>
+</div>
+<div class="font-mono text-sm text-gray-500 pb-2">SYSTEM STATUS: <span class="text-green-500">OPERATIONAL</span></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-1">
+<div class="bg-surface p-12 flex flex-col gap-4 group hover:bg-surface-container-low transition-colors duration-500">
+<span class="font-headline font-extrabold text-7xl text-on-background group-hover:text-primary transition-colors">124</span>
+<p class="font-mono text-xs tracking-widest uppercase text-gray-500">Batch Changes executed</p>
+</div>
+<div class="bg-surface p-12 flex flex-col gap-4 group hover:bg-surface-container-low transition-colors duration-500">
+<span class="font-headline font-extrabold text-7xl text-on-background group-hover:text-primary transition-colors">5167</span>
+<p class="font-mono text-xs tracking-widest uppercase text-gray-500">Changesets merged</p>
+</div>
+<div class="bg-surface p-12 flex flex-col gap-4 group hover:bg-surface-container-low transition-colors duration-500">
+<span class="font-headline font-extrabold text-7xl text-on-background group-hover:text-primary transition-colors">1292.00</span>
+<p class="font-mono text-xs tracking-widest uppercase text-gray-500">Hours human-time saved</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Feature Tabs Section -->
+<section class="py-24 px-6 md:px-24 bg-surface">
+<div class="max-w-7xl mx-auto">
+<div class="flex border-b border-outline-variant/10 mb-16 overflow-x-auto no-scrollbar">
+<button class="px-8 py-6 font-headline font-bold text-lg uppercase tracking-widest text-primary border-b-4 border-primary whitespace-nowrap">Configuration</button>
+<button class="px-8 py-6 font-headline font-bold text-lg uppercase tracking-widest text-gray-500 hover:text-white transition-colors whitespace-nowrap">Refactoring</button>
+<button class="px-8 py-6 font-headline font-bold text-lg uppercase tracking-widest text-gray-500 hover:text-white transition-colors whitespace-nowrap">Security</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+<div class="md:col-span-5">
+<h3 class="font-headline font-extrabold text-3xl md:text-4xl uppercase leading-tight mb-8">Declarative Code Management</h3>
+<p class="text-on-surface-variant text-lg leading-relaxed mb-10">
+                            Define what you want to change, not how to change it. Rift handles the orchestration across thousands of repositories, managing authentication, rate-limiting, and state recovery automatically.
+                        </p>
+<ul class="space-y-6">
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary mt-1">check_circle</span>
+<div>
+<strong class="block font-headline uppercase tracking-wider text-sm mb-1">Centralized Control</strong>
+<span class="text-sm text-gray-400">Manage all pending PRs from a single high-density dashboard.</span>
+</div>
+</li>
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary mt-1">check_circle</span>
+<div>
+<strong class="block font-headline uppercase tracking-wider text-sm mb-1">Stateful Execution</strong>
+<span class="text-sm text-gray-400">Pause, resume, or rollback changes across your entire fleet instantly.</span>
+</div>
+</li>
+</ul>
+</div>
+<div class="md:col-span-7">
+<div class="relative rounded-2xl overflow-hidden aspect-video bg-surface-container-lowest border border-outline-variant/20 group">
+<img alt="Abstract Code Visualization" class="object-cover w-full h-full opacity-40 group-hover:scale-105 transition-transform duration-700" data-alt="Dynamic abstract network of glowing data points and lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJ9w7x_KX54VQcds-WYqBRFKnXnB-Q-52oD5yi9DWaz1b_s9vNUHjTGTfhffXRh5RUJYGwmE5rUJ6x3XBGVsWla-z0VwORlcORIT15nu51vlbzkJ9WOboWqz7PW843PdUAFF52hmSiMXzF6HtQRQ3IXv_YjcIn455KNA0ZcUwz3Ukn02iApPYRUcyvA7dPh3NvV-mTFTWdtZzdBNiT9nTBQwlyi03jX25zIVgwbK_MASdcv-9hcOttw32T5SwcQAaQ49snMJTryB0R"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent"></div>
+<div class="absolute bottom-8 left-8">
+<span class="font-mono text-[10px] bg-primary-container text-on-primary-container px-3 py-1 rounded-full uppercase tracking-tighter">FEATURE PREVIEW</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-32 px-6 text-center bg-surface-container-low border-t border-outline-variant/10">
+<div class="max-w-3xl mx-auto">
+<h2 class="font-headline font-extrabold text-4xl md:text-6xl uppercase tracking-tighter mb-8 text-on-background">
+                    Ready to scale your engineering?
+                </h2>
+<p class="text-xl text-on-surface-variant mb-12">
+                    Join the world's most sophisticated engineering teams automating the mundane.
+                </p>
+<div class="flex flex-col md:flex-row gap-4 justify-center">
+<button class="kinetic-gradient text-on-primary-container font-headline font-bold uppercase tracking-widest px-12 py-6 rounded-full hover:shadow-[0_0_32px_rgba(255,85,67,0.4)] transition-all">
+                        Get Started Now
+                    </button>
+<button class="border border-outline text-on-surface font-headline font-bold uppercase tracking-widest px-12 py-6 rounded-full hover:bg-surface-container-high transition-all">
+                        Talk to an Architect
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-[#131313] py-20 px-6 md:px-24 border-t border-outline-variant/5">
+<div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-12">
+<div class="col-span-2">
+<span class="text-2xl font-black text-[#FF5543] tracking-tighter font-headline uppercase mb-6 block">RIFT</span>
+<p class="text-sm text-gray-500 max-w-xs leading-relaxed">
+                    The industrial-grade platform for large-scale code automation and repository management. Built for performance.
+                </p>
+</div>
+<div>
+<h4 class="font-headline font-bold uppercase text-xs tracking-[0.2em] text-on-surface mb-6">Product</h4>
+<ul class="space-y-4 font-mono text-xs text-gray-500 uppercase tracking-widest">
+<li><a class="hover:text-primary transition-colors" href="#">Features</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Pricing</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Batch Changes</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Security</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline font-bold uppercase text-xs tracking-[0.2em] text-on-surface mb-6">Company</h4>
+<ul class="space-y-4 font-mono text-xs text-gray-500 uppercase tracking-widest">
+<li><a class="hover:text-primary transition-colors" href="#">About</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Press</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline font-bold uppercase text-xs tracking-[0.2em] text-on-surface mb-6">Support</h4>
+<ul class="space-y-4 font-mono text-xs text-gray-500 uppercase tracking-widest">
+<li><a class="hover:text-primary transition-colors" href="#">Docs</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">API</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Status</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto mt-20 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="font-mono text-[10px] text-gray-600 tracking-widest uppercase">© 2024 RIFT INC. ALL RIGHTS RESERVED.</p>
+<div class="flex gap-8 font-mono text-[10px] text-gray-600 tracking-widest uppercase">
+<a class="hover:text-white transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-white transition-colors" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-16 bg-[#131313]/90 backdrop-blur-xl md:hidden border-t border-[#353535]">
+<div class="flex flex-col items-center justify-center bg-[#FF5543] text-[#5C0001] rounded-full px-4 py-1">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">layers</span>
+<span class="font-mono text-[10px] uppercase">Batch</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-500">
+<span class="material-symbols-outlined text-xl">search</span>
+<span class="font-mono text-[10px] uppercase">Search</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-500">
+<span class="material-symbols-outlined text-xl">analytics</span>
+<span class="font-mono text-[10px] uppercase">Insights</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-500">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="font-mono text-[10px] uppercase">Settings</span>
+</div>
+</nav>
+</body></html>

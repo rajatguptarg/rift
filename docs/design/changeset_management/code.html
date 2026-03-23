@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RIFT | Batch Changeset Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=Fira+Code:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#131313",
+                        "inverse-on-surface": "#303030",
+                        "on-error-container": "#ffdad6",
+                        "outline": "#aa8984",
+                        "surface-container-high": "#2a2a2a",
+                        "error": "#ffb4ab",
+                        "primary-container": "#ff5543",
+                        "on-primary-container": "#5c0001",
+                        "inverse-primary": "#b72117",
+                        "primary-fixed-dim": "#ffb4a9",
+                        "surface": "#131313",
+                        "on-primary-fixed-variant": "#930002",
+                        "on-secondary": "#2f2e43",
+                        "on-primary": "#690001",
+                        "tertiary": "#45d8ed",
+                        "secondary-container": "#47475d",
+                        "error-container": "#93000a",
+                        "tertiary-fixed-dim": "#45d8ed",
+                        "secondary-fixed": "#e2e0fc",
+                        "secondary-fixed-dim": "#c6c4df",
+                        "on-error": "#690005",
+                        "secondary": "#c6c4df",
+                        "on-tertiary-container": "#002f35",
+                        "on-tertiary-fixed-variant": "#004f58",
+                        "on-secondary-fixed-variant": "#45455b",
+                        "surface-bright": "#393939",
+                        "on-background": "#e2e2e2",
+                        "on-tertiary": "#00363d",
+                        "on-secondary-container": "#b8b6d0",
+                        "primary": "#ffb4a9",
+                        "surface-container-highest": "#353535",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed": "#98f0ff",
+                        "on-tertiary-fixed": "#001f24",
+                        "on-secondary-fixed": "#1a1a2e",
+                        "surface-tint": "#ffb4a9",
+                        "outline-variant": "#5b403c",
+                        "surface-container-low": "#1b1b1b",
+                        "inverse-surface": "#e2e2e2",
+                        "on-surface-variant": "#e4beb8",
+                        "surface-variant": "#353535",
+                        "on-surface": "#e2e2e2",
+                        "tertiary-container": "#00a0b1",
+                        "surface-container": "#1f1f1f",
+                        "primary-fixed": "#ffdad5",
+                        "on-primary-fixed": "#410000",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Fira Code"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .mono-label { font-family: 'Fira Code', monospace; }
+        .kinetic-gradient {
+            background: radial-gradient(circle at center, #ff5543 0%, #ffb4a9 100%);
+        }
+        .frosted-obsidian {
+            background: rgba(42, 42, 42, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-[#131313]">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black text-[#FF5543] tracking-tighter font-headline">RIFT</span>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-[#FF5543] border-b-2 border-[#FF5543] font-headline font-extrabold uppercase tracking-widest text-sm py-1" href="#">Batch Changes</a>
+<a class="text-gray-500 hover:text-[#FFB4A9] transition-colors font-headline font-extrabold uppercase tracking-widest text-sm py-1" href="#">Search</a>
+<a class="text-gray-500 hover:text-[#FFB4A9] transition-colors font-headline font-extrabold uppercase tracking-widest text-sm py-1" href="#">Insights</a>
+<a class="text-gray-500 hover:text-[#FFB4A9] transition-colors font-headline font-extrabold uppercase tracking-widest text-sm py-1" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">account_circle</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">sensors</button>
+</div>
+</header>
+<!-- SideNavBar (Hidden on mobile) -->
+<aside class="fixed left-0 top-16 bottom-0 hidden md:flex flex-col py-8 bg-[#131313] border-r border-[#353535]/20 w-64 z-40">
+<div class="px-6 mb-8">
+<div class="font-['Fira_Code'] text-xs uppercase tracking-widest text-[#FF5543]">OPERATIONS</div>
+<div class="font-['Fira_Code'] text-[10px] text-gray-400 opacity-80">v2.4.0-stable</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-6 py-3 bg-[#1B1B1B] text-[#FF5543] border-l-4 border-[#FF5543] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">layers</span>
+<span class="font-['Fira_Code'] text-xs uppercase tracking-widest">Batch Changes</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-gray-400 opacity-80 hover:bg-[#1B1B1B] hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-['Fira_Code'] text-xs uppercase tracking-widest">Search</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-gray-400 opacity-80 hover:bg-[#1B1B1B] hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-['Fira_Code'] text-xs uppercase tracking-widest">Insights</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-gray-400 opacity-80 hover:bg-[#1B1B1B] hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Fira_Code'] text-xs uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+<div class="px-6">
+<button class="w-full bg-[#FF5543] text-[#5C0001] rounded-full py-2 font-['Fira_Code'] text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform active:scale-95">
+                CREATE
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-20 pb-24 px-6 md:px-12 min-h-screen">
+<!-- Dashboard Header & Metrics -->
+<header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label text-[10px] uppercase tracking-widest text-primary">Live Operations Pool</span>
+</div>
+<h1 class="font-headline text-5xl md:text-7xl font-extrabold uppercase tracking-tight leading-none mb-4">
+                    Batch: <span class="text-primary-container">Secure-Auth-V3</span>
+</h1>
+<p class="max-w-xl text-on-surface-variant font-body leading-relaxed opacity-80">
+                    System-wide migration of authentication endpoints to V3 standards across 42 microservices. Tracking changeset parity and burndown velocity.
+                </p>
+</div>
+<div class="flex gap-4">
+<div class="bg-surface-container-lowest p-6 rounded-none border-l-2 border-primary-container min-w-[160px]">
+<div class="font-label text-[10px] text-on-surface-variant opacity-60 mb-1">PRs TOTAL</div>
+<div class="font-headline text-3xl font-bold">428</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-none border-l-2 border-tertiary min-w-[160px]">
+<div class="font-label text-[10px] text-on-surface-variant opacity-60 mb-1">MERGED</div>
+<div class="font-headline text-3xl font-bold">312</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-none border-l-2 border-error min-w-[160px]">
+<div class="font-label text-[10px] text-on-surface-variant opacity-60 mb-1">FAILED CHECKS</div>
+<div class="font-headline text-3xl font-bold">16</div>
+</div>
+</div>
+</header>
+<!-- Burndown Chart (Kinetic Monolith Style) -->
+<section class="mb-12">
+<div class="bg-surface-container-low p-8 relative overflow-hidden group">
+<div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#5b403c 1px, transparent 1px); background-size: 24px 24px;"></div>
+<div class="flex justify-between items-end mb-8 relative z-10">
+<h3 class="font-label text-xs uppercase tracking-[0.2em] text-on-surface-variant">Velocity Burndown Pattern</h3>
+<div class="flex gap-2">
+<span class="text-[10px] font-label text-primary">T-Minus 4h</span>
+</div>
+</div>
+<!-- Abstract Chart Visualization -->
+<div class="h-48 w-full flex items-end gap-1 relative z-10">
+<div class="flex-1 bg-surface-container-highest h-1/4 hover:h-full transition-all duration-500"></div>
+<div class="flex-1 bg-surface-container-highest h-2/5 hover:h-full transition-all duration-500"></div>
+<div class="flex-1 bg-surface-container-highest h-1/3 hover:h-full transition-all duration-500"></div>
+<div class="flex-1 bg-surface-container-highest h-3/5 hover:h-full transition-all duration-500"></div>
+<div class="flex-1 bg-primary-container/20 h-1/2 hover:h-full transition-all duration-500 border-t border-primary-container"></div>
+<div class="flex-1 bg-primary-container/40 h-2/3 hover:h-full transition-all duration-500 border-t border-primary-container"></div>
+<div class="flex-1 bg-primary-container/60 h-3/4 hover:h-full transition-all duration-500 border-t border-primary-container"></div>
+<div class="flex-1 bg-primary-container h-full hover:h-full transition-all duration-500 border-t border-primary-container shadow-[0_0_20px_rgba(255,85,67,0.3)]"></div>
+</div>
+</div>
+</section>
+<!-- Bulk Actions -->
+<div class="flex justify-between items-center mb-6">
+<div class="flex gap-4">
+<button class="px-6 py-2 rounded-full bg-primary-container text-on-primary-container font-label text-xs font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">Publish</button>
+<button class="px-6 py-2 rounded-full border border-outline-variant/30 text-primary font-label text-xs font-bold uppercase tracking-widest hover:bg-surface-container-high transition-all">Push</button>
+<button class="px-6 py-2 rounded-full border border-outline-variant/30 text-on-surface-variant font-label text-xs font-bold uppercase tracking-widest hover:bg-surface-container-high transition-all">Archive</button>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-lowest px-4 py-2 rounded-none border border-outline-variant/10">
+<span class="material-symbols-outlined text-sm text-tertiary">filter_list</span>
+<input class="bg-transparent border-none text-xs font-label focus:ring-0 w-48 placeholder:opacity-30" placeholder="Filter repositories..." type="text"/>
+</div>
+</div>
+<!-- Main Changeset Table -->
+<div class="bg-surface-container-low overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest">
+<th class="px-6 py-4 font-label text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">Repository Name</th>
+<th class="px-6 py-4 font-label text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">Branch</th>
+<th class="px-6 py-4 font-label text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">PR Status</th>
+<th class="px-6 py-4 font-label text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">CI Checks</th>
+<th class="px-6 py-4 font-label text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60 text-right">Review</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-high transition-colors group">
+<td class="px-6 py-5">
+<div class="font-headline font-bold text-lg tracking-tight group-hover:text-primary transition-colors">rift-core-engine</div>
+<div class="text-[10px] font-label text-on-surface-variant/40 mt-1">ID: 0x921A-FC</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-2 py-1 bg-surface-container-highest rounded-none font-label text-[10px] text-on-surface">feat/auth-v3-migration</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-sm">call_merge</span>
+<span class="font-label text-[10px] uppercase font-bold text-tertiary">Merged</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-1.5 px-3 py-1 bg-green-900/20 text-green-400 border border-green-500/20 rounded-full w-fit">
+<span class="material-symbols-outlined text-xs">check_circle</span>
+<span class="font-label text-[10px] uppercase font-bold">Passed</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="font-label text-[10px] text-green-400 uppercase font-bold tracking-widest">Approved</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-high transition-colors group">
+<td class="px-6 py-5">
+<div class="font-headline font-bold text-lg tracking-tight group-hover:text-primary transition-colors">identity-proxy-api</div>
+<div class="text-[10px] font-label text-on-surface-variant/40 mt-1">ID: 0xBC44-ED</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-2 py-1 bg-surface-container-highest rounded-none font-label text-[10px] text-on-surface">patch/v3-token-fix</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">open_in_new</span>
+<span class="font-label text-[10px] uppercase font-bold text-primary">Open</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-1.5 px-3 py-1 bg-error-container/20 text-error border border-error-container/20 rounded-full w-fit">
+<span class="material-symbols-outlined text-xs">error</span>
+<span class="font-label text-[10px] uppercase font-bold">Failed</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="font-label text-[10px] text-on-surface-variant/40 uppercase font-bold tracking-widest">Pending</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-high transition-colors group">
+<td class="px-6 py-5">
+<div class="font-headline font-bold text-lg tracking-tight group-hover:text-primary transition-colors">telemetry-adapter-v2</div>
+<div class="text-[10px] font-label text-on-surface-variant/40 mt-1">ID: 0x1102-SA</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-2 py-1 bg-surface-container-highest rounded-none font-label text-[10px] text-on-surface">refactor/auth-headers</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">open_in_new</span>
+<span class="font-label text-[10px] uppercase font-bold text-primary">Open</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-1.5 px-3 py-1 bg-yellow-900/20 text-yellow-400 border border-yellow-500/20 rounded-full w-fit">
+<span class="material-symbols-outlined text-xs">sync</span>
+<span class="font-label text-[10px] uppercase font-bold">Pending</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="font-label text-[10px] text-on-surface-variant/40 uppercase font-bold tracking-widest">Pending</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-high transition-colors group">
+<td class="px-6 py-5">
+<div class="font-headline font-bold text-lg tracking-tight group-hover:text-primary transition-colors">nexus-dashboard-ui</div>
+<div class="text-[10px] font-label text-on-surface-variant/40 mt-1">ID: 0x482F-ZX</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-2 py-1 bg-surface-container-highest rounded-none font-label text-[10px] text-on-surface">fix/auth-redirect</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-sm">call_merge</span>
+<span class="font-label text-[10px] uppercase font-bold text-tertiary">Merged</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-1.5 px-3 py-1 bg-green-900/20 text-green-400 border border-green-500/20 rounded-full w-fit">
+<span class="material-symbols-outlined text-xs">check_circle</span>
+<span class="font-label text-[10px] uppercase font-bold">Passed</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="font-label text-[10px] text-green-400 uppercase font-bold tracking-widest">Approved</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-16 md:hidden bg-[#131313]/90 backdrop-blur-xl border-t border-[#353535] shadow-[0_-8px_32px_rgba(255,85,67,0.05)]">
+<a class="flex flex-col items-center justify-center bg-[#FF5543] text-[#5C0001] rounded-full px-4 py-1 scale-110 duration-300" href="#">
+<span class="material-symbols-outlined">layers</span>
+<span class="font-['Fira_Code'] text-[10px]">Batch</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 hover:text-[#FFB4A9]" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-['Fira_Code'] text-[10px]">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 hover:text-[#FFB4A9]" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-['Fira_Code'] text-[10px]">Insights</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 hover:text-[#FFB4A9]" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Fira_Code'] text-[10px]">Settings</span>
+</a>
+</nav>
+<!-- Contextual FAB (Suppressed based on logic - not shown on batch detail unless it was a primary action) -->
+</body></html>

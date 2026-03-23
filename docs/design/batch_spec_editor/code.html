@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RIFT | Batch Spec Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=Fira+Code:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#131313",
+                        "inverse-on-surface": "#303030",
+                        "on-error-container": "#ffdad6",
+                        "outline": "#aa8984",
+                        "surface-container-high": "#2a2a2a",
+                        "error": "#ffb4ab",
+                        "primary-container": "#ff5543",
+                        "on-primary-container": "#5c0001",
+                        "inverse-primary": "#b72117",
+                        "primary-fixed-dim": "#ffb4a9",
+                        "surface": "#131313",
+                        "on-primary-fixed-variant": "#930002",
+                        "on-secondary": "#2f2e43",
+                        "on-primary": "#690001",
+                        "tertiary": "#45d8ed",
+                        "secondary-container": "#47475d",
+                        "error-container": "#93000a",
+                        "tertiary-fixed-dim": "#45d8ed",
+                        "secondary-fixed": "#e2e0fc",
+                        "secondary-fixed-dim": "#c6c4df",
+                        "on-error": "#690005",
+                        "secondary": "#c6c4df",
+                        "on-tertiary-container": "#002f35",
+                        "on-tertiary-fixed-variant": "#004f58",
+                        "on-secondary-fixed-variant": "#45455b",
+                        "surface-bright": "#393939",
+                        "on-background": "#e2e2e2",
+                        "on-tertiary": "#00363d",
+                        "on-secondary-container": "#b8b6d0",
+                        "primary": "#ffb4a9",
+                        "surface-container-highest": "#353535",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed": "#98f0ff",
+                        "on-tertiary-fixed": "#001f24",
+                        "on-secondary-fixed": "#1a1a2e",
+                        "surface-tint": "#ffb4a9",
+                        "outline-variant": "#5b403c",
+                        "surface-container-low": "#1b1b1b",
+                        "inverse-surface": "#e2e2e2",
+                        "on-surface-variant": "#e4beb8",
+                        "surface-variant": "#353535",
+                        "on-surface": "#e2e2e2",
+                        "tertiary-container": "#00a0b1",
+                        "surface-container": "#1f1f1f",
+                        "primary-fixed": "#ffdad5",
+                        "on-primary-fixed": "#410000",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["Fira Code"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #131313; }
+        ::-webkit-scrollbar-thumb { background: #353535; border-radius: 10px; }
+        .code-syntax-keyword { color: #45d8ed; }
+        .code-syntax-string { color: #a5d6ff; }
+        .code-syntax-key { color: #ffb4a9; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container selection:text-on-primary-container overflow-hidden">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-[#131313]">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black text-[#FF5543] tracking-tighter font-['Space_Grotesk'] uppercase tracking-widest">RIFT</span>
+<nav class="hidden md:flex gap-6 items-center h-full">
+<div class="flex items-center gap-2 text-gray-500 font-mono text-xs tracking-widest uppercase">
+<span>Batch Changes</span>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span class="text-[#FF5543] border-b-2 border-[#FF5543] pb-1">New Batch Change</span>
+</div>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center bg-surface-container-low px-3 py-1.5 rounded-full border border-outline-variant/10">
+<span class="material-symbols-outlined text-gray-500 text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-xs w-48 text-on-surface" placeholder="Search spec..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-gray-400 hover:text-primary transition-colors">sensors</button>
+<button class="material-symbols-outlined text-gray-400 hover:text-primary transition-colors">account_circle</button>
+</div>
+</header>
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-16 bottom-0 flex flex-col py-8 bg-[#131313] border-r border-[#353535]/20 w-64 hidden lg:flex">
+<div class="px-6 mb-8">
+<h2 class="font-['Fira_Code'] text-xs uppercase tracking-widest text-[#FF5543]">OPERATIONS</h2>
+<p class="font-['Fira_Code'] text-[10px] text-gray-500">v2.4.0-stable</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-6 py-3 bg-[#1B1B1B] text-[#FF5543] border-l-4 border-[#FF5543] transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">layers</span>
+<span class="font-['Fira_Code'] text-xs uppercase tracking-widest">Batch Changes</span>
+</a>
+<a class="flex items-center px-6 py-3 text-gray-400 opacity-80 hover:bg-[#1B1B1B] hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">search</span>
+<span class="font-['Fira_Code'] text-xs uppercase tracking-widest">Search</span>
+</a>
+<a class="flex items-center px-6 py-3 text-gray-400 opacity-80 hover:bg-[#1B1B1B] hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">analytics</span>
+<span class="font-['Fira_Code'] text-xs uppercase tracking-widest">Insights</span>
+</a>
+<a class="flex items-center px-6 py-3 text-gray-400 opacity-80 hover:bg-[#1B1B1B] hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+<span class="font-['Fira_Code'] text-xs uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<button class="w-full bg-primary-container text-on-primary-container py-3 rounded-full font-headline font-bold text-xs tracking-widest uppercase hover:scale-95 active:scale-90 transition-transform">
+                CREATE
+            </button>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="lg:ml-64 pt-16 h-screen flex flex-col bg-surface">
+<!-- Editor Tabs & Actions Bar -->
+<div class="flex items-center justify-between px-6 h-14 bg-surface-container-low border-b border-outline-variant/5">
+<div class="flex gap-8 h-full">
+<button class="flex items-center gap-2 h-full border-b-2 border-primary text-primary font-mono text-[11px] uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">edit_note</span>
+                    Editor
+                </button>
+<button class="flex items-center gap-2 h-full border-b-2 border-transparent text-gray-500 font-mono text-[11px] uppercase tracking-wider hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">terminal</span>
+                    Execution Logs
+                </button>
+</div>
+<button class="bg-primary-container text-on-primary-container px-6 py-2 rounded-full font-headline font-extrabold text-xs uppercase tracking-tighter flex items-center gap-2 hover:shadow-[0_0_15px_rgba(255,85,67,0.4)] transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                Run batch spec
+            </button>
+</div>
+<!-- Content Area: Two Column Workspace -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left Column: Code Editor -->
+<section class="w-[60%] bg-surface-container-lowest relative flex flex-col border-r border-outline-variant/10">
+<div class="flex-1 overflow-auto p-6 font-mono text-[13px] leading-relaxed custom-scrollbar">
+<div class="flex">
+<div class="pr-6 text-gray-600 text-right select-none w-10">
+                            1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15
+                        </div>
+<div class="flex-1 whitespace-pre">
+<span class="code-syntax-key">name:</span> <span class="code-syntax-string">update-node-version</span>
+<span class="code-syntax-key">description:</span> <span class="code-syntax-string">Upgrade all repositories to Node.js v20 LTS</span>
+<span class="code-syntax-key">on:</span>
+  - <span class="code-syntax-key">repositoriesMatchingQuery:</span> <span class="code-syntax-string">file:package.json node:18</span>
+<span class="code-syntax-key">steps:</span>
+  - <span class="code-syntax-key">run:</span> <span class="code-syntax-string">sed -i 's/"node": "18"/"node": "20"/' package.json</span>
+<span class="code-syntax-key">container:</span> <span class="code-syntax-string">alpine:3</span>
+  - <span class="code-syntax-key">run:</span> <span class="code-syntax-string">npm install &amp;&amp; npm test</span>
+<span class="code-syntax-key">container:</span> <span class="code-syntax-string">node:20-alpine</span>
+<span class="code-syntax-key">changesetTemplate:</span>
+<span class="code-syntax-key">title:</span> <span class="code-syntax-string">Upgrade Node.js to v20</span>
+<span class="code-syntax-key">body:</span> <span class="code-syntax-string">This batch change updates the node engine version in package.json.</span>
+<span class="code-syntax-key">branch:</span> <span class="code-syntax-string">automation/node-20-upgrade</span>
+<span class="code-syntax-key">commit:</span>
+<span class="code-syntax-key">message:</span> <span class="code-syntax-string">build: upgrade node version to 20</span></div>
+</div>
+</div>
+<!-- Editor Meta -->
+<div class="h-8 px-4 bg-surface-container-low border-t border-outline-variant/10 flex items-center justify-between font-mono text-[10px] text-gray-500">
+<div class="flex gap-4">
+<span>YAML</span>
+<span>UTF-8</span>
+</div>
+<div class="flex gap-4">
+<span>Ln 12, Col 4</span>
+<span>245 Characters</span>
+</div>
+</div>
+</section>
+<!-- Right Column: Preview Panel -->
+<section class="flex-1 bg-surface flex flex-col overflow-hidden">
+<div class="p-6 overflow-y-auto custom-scrollbar space-y-8">
+<!-- Preview Header -->
+<div class="space-y-1">
+<h3 class="font-headline font-extrabold text-xl uppercase tracking-wider text-on-surface">Preview</h3>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-mono text-[11px] text-tertiary uppercase tracking-widest">LIVE DATA SYNC</span>
+</div>
+</div>
+<!-- Search Result Stats -->
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant/5">
+<p class="font-mono text-[10px] text-gray-500 uppercase">Affected Repos</p>
+<p class="font-headline font-extrabold text-2xl text-on-surface">142</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant/5">
+<p class="font-mono text-[10px] text-gray-500 uppercase">Workspaces</p>
+<p class="font-headline font-extrabold text-2xl text-on-surface">8</p>
+</div>
+</div>
+<!-- Repository List -->
+<div class="space-y-4">
+<p class="font-mono text-[11px] text-gray-500 uppercase tracking-widest">Target Repositories</p>
+<div class="space-y-2">
+<!-- Repo Item -->
+<div class="group p-4 bg-surface-container-lowest rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer border-l-2 border-transparent hover:border-primary">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">database</span>
+<span class="font-mono text-xs font-bold text-on-surface">github.com/rift-org/core-api</span>
+</div>
+<span class="font-mono text-[9px] bg-secondary-container/30 text-secondary-fixed px-2 py-0.5 rounded uppercase">Public</span>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-gray-500">description</span>
+<span class="font-mono text-[10px] text-gray-500">package.json</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-gray-500">history</span>
+<span class="font-mono text-[10px] text-gray-500">2m ago</span>
+</div>
+</div>
+</div>
+<!-- Repo Item -->
+<div class="group p-4 bg-surface-container-lowest rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer border-l-2 border-transparent hover:border-primary">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">database</span>
+<span class="font-mono text-xs font-bold text-on-surface">github.com/rift-org/frontend-monorepo</span>
+</div>
+<span class="font-mono text-[9px] bg-outline-variant/20 text-gray-400 px-2 py-0.5 rounded uppercase">Private</span>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-gray-500">description</span>
+<span class="font-mono text-[10px] text-gray-500">apps/web/package.json</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-gray-500">history</span>
+<span class="font-mono text-[10px] text-gray-500">15m ago</span>
+</div>
+</div>
+</div>
+<!-- Repo Item -->
+<div class="group p-4 bg-surface-container-lowest rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer border-l-2 border-transparent hover:border-primary">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">database</span>
+<span class="font-mono text-xs font-bold text-on-surface">gitlab.com/rift-org/billing-service</span>
+</div>
+<span class="font-mono text-[9px] bg-secondary-container/30 text-secondary-fixed px-2 py-0.5 rounded uppercase">Public</span>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-gray-500">description</span>
+<span class="font-mono text-[10px] text-gray-500">package.json</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-gray-500">history</span>
+<span class="font-mono text-[10px] text-gray-500">1h ago</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar Shell (Mobile only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-16 bg-[#131313]/90 backdrop-blur-xl border-t border-[#353535] md:hidden">
+<div class="flex flex-col items-center justify-center bg-[#FF5543] text-[#5C0001] rounded-full px-4 py-1 scale-110 duration-300">
+<span class="material-symbols-outlined">layers</span>
+<span class="font-['Fira_Code'] text-[10px]">Batch</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-500 hover:text-[#FFB4A9]">
+<span class="material-symbols-outlined">search</span>
+<span class="font-['Fira_Code'] text-[10px]">Search</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-500 hover:text-[#FFB4A9]">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-['Fira_Code'] text-[10px]">Insights</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-500 hover:text-[#FFB4A9]">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Fira_Code'] text-[10px]">Settings</span>
+</div>
+</nav>
+</body></html>
