@@ -1,0 +1,209 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Rift Batch Changes Platform — Full local stack
+#
+# Services:
+#   Infrastructure : mongodb, redis, temporal, temporal-ui, minio
+#   Application    : api, worker, frontend
+#
+# Usage:
+#   docker compose up --build        # first run (builds images)
+#   docker compose up                # subsequent runs
+#   docker compose up api worker     # just backend services
+#   docker compose logs -f api       # follow API logs
+#
+# Access:
+#   Frontend   → http://localhost:3000
+#   API / docs → http://localhost:8000/docs
+#   Temporal   → http://localhost:8088
+#   MinIO      → http://localhost:9001  (user: minioadmin / minioadmin)
+# ─────────────────────────────────────────────────────────────────────────────
+
+x-backend-env: &backend-env
+  APP_ENV: development
+  APP_SECRET_KEY: local-dev-secret-key-32chars-min!
+  LOG_LEVEL: info
+  MONGODB_URL: mongodb://rift:riftdev@mongodb:27017/rift?authSource=admin
+  MONGODB_DATABASE: rift
+  REDIS_URL: redis://redis:6379/0
+  TEMPORAL_HOST: temporal:7233
+  TEMPORAL_NAMESPACE: default
+  TEMPORAL_TASK_QUEUE: rift-main
+  JWT_SECRET: local-dev-jwt-secret-32chars-min!!
+  JWT_ALGORITHM: HS256
+  JWT_EXPIRE_MINUTES: "1440"
+  KMS_KEY_REF: local-dev-key
+  KMS_PROVIDER: local
+  OBJECT_STORE_ENDPOINT: http://minio:9000
+  OBJECT_STORE_BUCKET: rift-artifacts
+  OBJECT_STORE_ACCESS_KEY: minioadmin
+  OBJECT_STORE_SECRET_KEY: minioadmin
+  OBJECT_STORE_REGION: us-east-1
+  API_HOST: 0.0.0.0
+  API_PORT: "8000"
+  API_CORS_ORIGINS: "http://localhost:3000"
+
+services:
+
+  # ── Infrastructure ──────────────────────────────────────────────────────────
+
+  mongodb:
+    image: mongo:7.0
+    container_name: rift-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: rift
+      MONGO_INITDB_ROOT_PASSWORD: riftdev
+      MONGO_INITDB_DATABASE: rift
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "-u", "rift", "-p", "riftdev", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: rift-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  temporal:
+    image: temporalio/auto-setup:1.24
+    container_name: rift-temporal
+    restart: unless-stopped
+    ports:
+      - "7233:7233"
+    environment:
+      DB: sqlite
+    healthcheck:
+      test: ["CMD", "tctl", "--address", "localhost:7233", "cluster", "health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
+
+  temporal-ui:
+    image: temporalio/ui:2.28.0
+    container_name: rift-temporal-ui
+    restart: unless-stopped
+    ports:
+      - "8088:8080"
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+    depends_on:
+      temporal:
+        condition: service_started
+
+  minio:
+    image: minio/minio:RELEASE.2024-01-16T16-07-38Z
+    container_name: rift-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Web console
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Creates the S3 bucket on first boot
+  minio-init:
+    image: minio/mc:RELEASE.2024-01-16T16-07-38Z
+    container_name: rift-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 minioadmin minioadmin &&
+        mc mb --ignore-existing local/rift-artifacts &&
+        echo 'Bucket ready.'
+      "
+    restart: "no"
+
+  # ── Application ─────────────────────────────────────────────────────────────
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: api
+    container_name: rift-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      <<: *backend-env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      temporal:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: worker
+    container_name: rift-worker
+    restart: unless-stopped
+    environment:
+      <<: *backend-env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      temporal:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: serve
+      args:
+        # Points to the nginx proxy path so the browser hits the right API
+        VITE_API_BASE_URL: /api
+    container_name: rift-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  mongo_data:
+  redis_data:
+  minio_data:

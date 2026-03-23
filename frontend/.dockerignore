@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+playwright-report
+.env
+.env.*
+!.env.example
+*.md
+nginx.conf
+Dockerfile

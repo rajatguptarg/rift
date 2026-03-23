@@ -1,4 +1,37 @@
-# Claude Code Guide
+# rift Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2026-03-23
+
+## Active Technologies
+- Python 3.12 (backend), TypeScript 5.x (frontend/CLI) + FastAPI, Pydantic, Motor (async MongoDB driver), Temporal Python SDK, React 18, React Router, TanStack Query, Tailwind CSS 3.x (utility-first styling), Material Symbols Outlined (icon font), Space Grotesk / Inter / Fira Code (Google Fonts) (001-batch-changes-platform)
+- MongoDB (primary), Redis (cache + coordination), S3-compatible object storage (logs/patches) (001-batch-changes-platform)
+
+- Python 3.12 (backend), TypeScript 5.x (frontend/CLI) + FastAPI, Pydantic, Motor (async MongoDB driver), Temporal Python SDK, React 18, React Router, TanStack Query (001-batch-changes-platform)
+
+## Project Structure
+
+```text
+backend/
+frontend/
+tests/
+```
+
+## Commands
+
+cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLOGIES] pytest [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLOGIES] ruff check .
+
+## Code Style
+
+Python 3.12 (backend), TypeScript 5.x (frontend/CLI): Follow standard conventions
+
+## Recent Changes
+- 001-batch-changes-platform: Added Python 3.12 (backend), TypeScript 5.x (frontend/CLI) + FastAPI, Pydantic, Motor (async MongoDB driver), Temporal Python SDK, React 18, React Router, TanStack Query, Tailwind CSS 3.x (utility-first styling), Material Symbols Outlined (icon font), Space Grotesk / Inter / Fira Code (Google Fonts)
+
+- 001-batch-changes-platform: Added Python 3.12 (backend), TypeScript 5.x (frontend/CLI) + FastAPI, Pydantic, Motor (async MongoDB driver), Temporal Python SDK, React 18, React Router, TanStack Query
+
+<!-- MANUAL ADDITIONS START -->
+
+# Guide
 
 You must find all the documentation, architecture under the `docs/` and `specs/` folders.
 
@@ -214,3 +247,5 @@ Smaller PRs are reviewed faster and merged more safely.
 * Delete the branch after merge
 
 PRs that do not follow these rules may be sent back for rework.
+
+<!-- MANUAL ADDITIONS END -->

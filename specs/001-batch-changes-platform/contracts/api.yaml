@@ -1,0 +1,998 @@
+openapi: "3.1.0"
+info:
+  title: Rift Batch Changes API
+  version: "1.0.0"
+  description: |
+    REST API for the Rift Batch Changes platform. Enables creating, previewing,
+    applying, publishing, and tracking large-scale code changes across repositories.
+
+servers:
+  - url: /api/v1
+    description: Versioned API base path
+
+tags:
+  - name: batch-changes
+    description: Batch change lifecycle
+  - name: batch-runs
+    description: Execution run management
+  - name: changesets
+    description: Changeset tracking and actions
+  - name: credentials
+    description: Code host credential management
+  - name: templates
+    description: Batch spec template library
+  - name: audit
+    description: Audit event log
+  - name: streams
+    description: Server-sent event streams
+
+paths:
+  /batch-changes:
+    get:
+      operationId: listBatchChanges
+      tags: [batch-changes]
+      summary: List batch changes
+      parameters:
+        - $ref: "#/components/parameters/NamespaceId"
+        - $ref: "#/components/parameters/State"
+        - $ref: "#/components/parameters/PageCursor"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Paginated list of batch changes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchChangeListResponse"
+    post:
+      operationId: createBatchChange
+      tags: [batch-changes]
+      summary: Create a new batch change
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBatchChangeRequest"
+      responses:
+        "201":
+          description: Batch change created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchChange"
+
+  /batch-changes/{batchChangeId}:
+    get:
+      operationId: getBatchChange
+      tags: [batch-changes]
+      summary: Get a batch change by ID
+      parameters:
+        - $ref: "#/components/parameters/BatchChangeId"
+      responses:
+        "200":
+          description: Batch change details with stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchChangeDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /batch-changes/{batchChangeId}/spec:
+    put:
+      operationId: updateBatchSpec
+      tags: [batch-changes]
+      summary: Update the batch spec YAML for a batch change
+      parameters:
+        - $ref: "#/components/parameters/BatchChangeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBatchSpecRequest"
+      responses:
+        "200":
+          description: Batch spec updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchSpec"
+
+  /batch-changes/{batchChangeId}/preview:
+    post:
+      operationId: runPreview
+      tags: [batch-changes]
+      summary: Start a preview run for a batch change
+      parameters:
+        - $ref: "#/components/parameters/BatchChangeId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunPreviewRequest"
+      responses:
+        "202":
+          description: Preview run started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchRun"
+
+  /batch-changes/{batchChangeId}/apply:
+    post:
+      operationId: applyBatchChange
+      tags: [batch-changes]
+      summary: Apply a batch change (finalize from preview or direct apply)
+      parameters:
+        - $ref: "#/components/parameters/BatchChangeId"
+      responses:
+        "200":
+          description: Batch change applied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchChange"
+
+  /batch-changes/{batchChangeId}/publish:
+    post:
+      operationId: publishChangesets
+      tags: [batch-changes]
+      summary: Publish selected changesets to code hosts
+      parameters:
+        - $ref: "#/components/parameters/BatchChangeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishChangesetsRequest"
+      responses:
+        "202":
+          description: Publish initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishResult"
+
+  /batch-changes/{batchChangeId}/close:
+    post:
+      operationId: closeBatchChange
+      tags: [batch-changes]
+      summary: Close a batch change
+      parameters:
+        - $ref: "#/components/parameters/BatchChangeId"
+      responses:
+        "200":
+          description: Batch change closed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchChange"
+
+  /batch-changes/{batchChangeId}/archive:
+    post:
+      operationId: archiveBatchChange
+      tags: [batch-changes]
+      summary: Archive a batch change
+      parameters:
+        - $ref: "#/components/parameters/BatchChangeId"
+      responses:
+        "200":
+          description: Batch change archived
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchChange"
+
+  /batch-changes/{batchChangeId}/changesets:
+    get:
+      operationId: listChangesets
+      tags: [changesets]
+      summary: List changesets for a batch change
+      parameters:
+        - $ref: "#/components/parameters/BatchChangeId"
+        - name: state
+          in: query
+          schema:
+            $ref: "#/components/schemas/ChangesetState"
+        - name: reviewState
+          in: query
+          schema:
+            $ref: "#/components/schemas/ReviewState"
+        - name: checkState
+          in: query
+          schema:
+            $ref: "#/components/schemas/CheckState"
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Filter by repository name or changeset title
+        - $ref: "#/components/parameters/PageCursor"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Paginated list of changesets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangesetListResponse"
+
+  /batch-changes/{batchChangeId}/imports:
+    post:
+      operationId: importChangesets
+      tags: [changesets]
+      summary: Import externally-created changesets into a batch change
+      parameters:
+        - $ref: "#/components/parameters/BatchChangeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportChangesetsRequest"
+      responses:
+        "201":
+          description: Changesets imported
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResult"
+
+  /batch-changes/{batchChangeId}/stats:
+    get:
+      operationId: getBatchChangeStats
+      tags: [batch-changes]
+      summary: Get aggregate statistics for a batch change
+      parameters:
+        - $ref: "#/components/parameters/BatchChangeId"
+      responses:
+        "200":
+          description: Batch change stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchChangeStats"
+
+  /batch-changes/{batchChangeId}/burndown:
+    get:
+      operationId: getBurndown
+      tags: [batch-changes]
+      summary: Get burndown chart data
+      parameters:
+        - $ref: "#/components/parameters/BatchChangeId"
+      responses:
+        "200":
+          description: Daily burndown data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BurndownResponse"
+
+  /batch-runs/{batchRunId}:
+    get:
+      operationId: getBatchRun
+      tags: [batch-runs]
+      summary: Get a batch run by ID
+      parameters:
+        - name: batchRunId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Batch run details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchRunDetail"
+
+  /batch-runs/{batchRunId}/workspaces/{workspaceId}/exclude:
+    post:
+      operationId: excludeWorkspace
+      tags: [batch-runs]
+      summary: Exclude a workspace from a batch run
+      parameters:
+        - name: batchRunId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExcludeWorkspaceRequest"
+      responses:
+        "200":
+          description: Workspace excluded
+
+  /credentials:
+    get:
+      operationId: listCredentials
+      tags: [credentials]
+      summary: List credentials for the current user or namespace
+      parameters:
+        - $ref: "#/components/parameters/NamespaceId"
+      responses:
+        "200":
+          description: Credential list (tokens redacted)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredentialListResponse"
+    post:
+      operationId: createCredential
+      tags: [credentials]
+      summary: Store a new code host credential
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCredentialRequest"
+      responses:
+        "201":
+          description: Credential stored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredentialSummary"
+
+  /credentials/{credentialId}:
+    delete:
+      operationId: deleteCredential
+      tags: [credentials]
+      summary: Delete a stored credential
+      parameters:
+        - name: credentialId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Credential deleted
+
+  /templates:
+    get:
+      operationId: listTemplates
+      tags: [templates]
+      summary: List available batch spec templates
+      parameters:
+        - $ref: "#/components/parameters/NamespaceId"
+      responses:
+        "200":
+          description: Template list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TemplateListResponse"
+    post:
+      operationId: createTemplate
+      tags: [templates]
+      summary: Create a new batch spec template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplateRequest"
+      responses:
+        "201":
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Template"
+
+  /audit-events:
+    get:
+      operationId: listAuditEvents
+      tags: [audit]
+      summary: List audit events
+      parameters:
+        - $ref: "#/components/parameters/NamespaceId"
+        - name: resourceType
+          in: query
+          schema:
+            type: string
+        - name: since
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - $ref: "#/components/parameters/PageCursor"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Paginated audit events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditEventListResponse"
+
+  /streams/batch-runs/{batchRunId}:
+    get:
+      operationId: streamBatchRun
+      tags: [streams]
+      summary: SSE stream for live batch run updates
+      parameters:
+        - name: batchRunId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Server-sent event stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: |
+                  Events: workspace_started, workspace_completed, workspace_failed,
+                  step_output, run_completed, run_failed
+
+components:
+  parameters:
+    BatchChangeId:
+      name: batchChangeId
+      in: path
+      required: true
+      schema:
+        type: string
+    NamespaceId:
+      name: namespaceId
+      in: query
+      schema:
+        type: string
+    State:
+      name: state
+      in: query
+      schema:
+        type: string
+        enum: [DRAFT, PREVIEW_RUNNING, PREVIEW_READY, APPLYING, ACTIVE, PAUSED, ARCHIVED, FAILED]
+    PageCursor:
+      name: cursor
+      in: query
+      schema:
+        type: string
+      description: Cursor-based pagination token
+    PageSize:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    PaginationInfo:
+      type: object
+      properties:
+        next_cursor:
+          type: string
+          nullable: true
+        has_more:
+          type: boolean
+        total_count:
+          type: integer
+
+    # --- Batch Change ---
+
+    CreateBatchChangeRequest:
+      type: object
+      required: [name, namespace_id, spec_yaml]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 256
+        description:
+          type: string
+          maxLength: 4096
+        namespace_id:
+          type: string
+        spec_yaml:
+          type: string
+        template_id:
+          type: string
+          nullable: true
+        template_bindings:
+          type: object
+          additionalProperties:
+            type: string
+          nullable: true
+
+    BatchChange:
+      type: object
+      properties:
+        id:
+          type: string
+        namespace_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        source_mode:
+          type: string
+          enum: [UI, CLI]
+        state:
+          type: string
+          enum: [DRAFT, PREVIEW_RUNNING, PREVIEW_READY, APPLYING, ACTIVE, PAUSED, ARCHIVED, FAILED]
+        created_by:
+          type: string
+        active_spec_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    BatchChangeDetail:
+      allOf:
+        - $ref: "#/components/schemas/BatchChange"
+        - type: object
+          properties:
+            stats:
+              $ref: "#/components/schemas/BatchChangeStats"
+            active_run:
+              $ref: "#/components/schemas/BatchRun"
+              nullable: true
+
+    BatchChangeListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/BatchChange"
+        pagination:
+          $ref: "#/components/schemas/PaginationInfo"
+
+    # --- Batch Spec ---
+
+    UpdateBatchSpecRequest:
+      type: object
+      required: [spec_yaml]
+      properties:
+        spec_yaml:
+          type: string
+
+    BatchSpec:
+      type: object
+      properties:
+        id:
+          type: string
+        batch_change_id:
+          type: string
+        spec_hash:
+          type: string
+        search_query:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    # --- Batch Run ---
+
+    RunPreviewRequest:
+      type: object
+      properties:
+        skip_errors:
+          type: boolean
+          default: false
+
+    BatchRun:
+      type: object
+      properties:
+        id:
+          type: string
+        batch_change_id:
+          type: string
+        mode:
+          type: string
+          enum: [PREVIEW, APPLY]
+        state:
+          type: string
+          enum: [QUEUED, RUNNING, COMPLETED, FAILED, CANCELLED]
+        skip_errors:
+          type: boolean
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        summary:
+          $ref: "#/components/schemas/RunSummary"
+
+    BatchRunDetail:
+      allOf:
+        - $ref: "#/components/schemas/BatchRun"
+        - type: object
+          properties:
+            workspaces:
+              type: array
+              items:
+                $ref: "#/components/schemas/WorkspaceExecution"
+
+    RunSummary:
+      type: object
+      properties:
+        total:
+          type: integer
+        succeeded:
+          type: integer
+        failed:
+          type: integer
+        pending:
+          type: integer
+
+    WorkspaceExecution:
+      type: object
+      properties:
+        id:
+          type: string
+        repository_name:
+          type: string
+          description: Redacted to REDACTED_REPOSITORY if user lacks access
+        workspace_path:
+          type: string
+        state:
+          type: string
+          enum: [QUEUED, RUNNING, SUCCEEDED, FAILED, CANCELLED, SKIPPED]
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExecutionStep"
+
+    ExecutionStep:
+      type: object
+      properties:
+        step_index:
+          type: integer
+        container_image:
+          type: string
+        exit_code:
+          type: integer
+          nullable: true
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        outputs:
+          type: object
+          additionalProperties:
+            type: string
+
+    ExcludeWorkspaceRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+
+    # --- Changesets ---
+
+    ChangesetState:
+      type: string
+      enum: [OPEN, CLOSED, MERGED]
+
+    ReviewState:
+      type: string
+      enum: [PENDING, APPROVED, CHANGES_REQUESTED]
+
+    CheckState:
+      type: string
+      enum: [PENDING, PASSED, FAILED]
+
+    Changeset:
+      type: object
+      properties:
+        id:
+          type: string
+        changeset_spec_id:
+          type: string
+        repository_name:
+          type: string
+          description: Redacted to REDACTED_REPOSITORY if user lacks access
+        external_url:
+          type: string
+          nullable: true
+          description: Redacted if user lacks access
+        branch_ref:
+          type: string
+        title:
+          type: string
+        is_draft:
+          type: boolean
+        state:
+          $ref: "#/components/schemas/ChangesetState"
+        review_state:
+          $ref: "#/components/schemas/ReviewState"
+        check_state:
+          $ref: "#/components/schemas/CheckState"
+        publication_mode:
+          type: string
+          enum: [UNPUBLISHED, PUBLISH, DRAFT, PUSH_ONLY]
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        merged_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    ChangesetListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Changeset"
+        pagination:
+          $ref: "#/components/schemas/PaginationInfo"
+
+    PublishChangesetsRequest:
+      type: object
+      required: [changeset_ids, mode]
+      properties:
+        changeset_ids:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        mode:
+          type: string
+          enum: [PUBLISH, DRAFT, PUSH_ONLY]
+
+    PublishResult:
+      type: object
+      properties:
+        queued_count:
+          type: integer
+        failed_count:
+          type: integer
+        failures:
+          type: array
+          items:
+            type: object
+            properties:
+              changeset_id:
+                type: string
+              error:
+                type: string
+
+    ImportChangesetsRequest:
+      type: object
+      required: [external_urls]
+      properties:
+        external_urls:
+          type: array
+          items:
+            type: string
+            format: uri
+          minItems: 1
+
+    ImportResult:
+      type: object
+      properties:
+        imported_count:
+          type: integer
+        failed_count:
+          type: integer
+        changesets:
+          type: array
+          items:
+            $ref: "#/components/schemas/Changeset"
+
+    # --- Stats & Burndown ---
+
+    BatchChangeStats:
+      type: object
+      properties:
+        total_workspaces:
+          type: integer
+        successful_specs:
+          type: integer
+        failed_workspaces:
+          type: integer
+        unpublished_count:
+          type: integer
+        open_count:
+          type: integer
+        merged_count:
+          type: integer
+        closed_count:
+          type: integer
+        ci_passed_count:
+          type: integer
+        ci_failed_count:
+          type: integer
+        review_approved_count:
+          type: integer
+        estimated_hours_saved:
+          type: number
+          format: float
+
+    BurndownResponse:
+      type: object
+      properties:
+        data_points:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              merged_count:
+                type: integer
+              open_count:
+                type: integer
+              remaining_count:
+                type: integer
+
+    # --- Credentials ---
+
+    CreateCredentialRequest:
+      type: object
+      required: [code_host_id, token]
+      properties:
+        code_host_id:
+          type: string
+        namespace_id:
+          type: string
+          nullable: true
+          description: Null for personal credential
+        token:
+          type: string
+          format: password
+        scopes:
+          type: array
+          items:
+            type: string
+
+    CredentialSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        code_host_id:
+          type: string
+        namespace_id:
+          type: string
+          nullable: true
+        scopes:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+
+    CredentialListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CredentialSummary"
+
+    # --- Templates ---
+
+    CreateTemplateRequest:
+      type: object
+      required: [name, spec_template_yaml, form_schema]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        namespace_id:
+          type: string
+          nullable: true
+        spec_template_yaml:
+          type: string
+        form_schema:
+          type: object
+          description: JSON Schema for template form fields
+        validation_rules:
+          type: object
+          additionalProperties:
+            type: string
+          description: Regex validation per field name
+
+    Template:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        form_schema:
+          type: object
+        validation_rules:
+          type: object
+          additionalProperties:
+            type: string
+        is_builtin:
+          type: boolean
+        is_active:
+          type: boolean
+
+    TemplateListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Template"
+
+    # --- Audit ---
+
+    AuditEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        actor_user_id:
+          type: string
+        resource_type:
+          type: string
+        resource_id:
+          type: string
+        action:
+          type: string
+        payload:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+
+    AuditEventListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditEvent"
+        pagination:
+          $ref: "#/components/schemas/PaginationInfo"
