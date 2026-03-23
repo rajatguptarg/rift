@@ -10,7 +10,7 @@ Build the Rift Batch Changes platform — a declarative control plane with an ep
 ## Technical Context
 
 **Language/Version**: Python 3.12 (backend), TypeScript 5.x (frontend/CLI)
-**Primary Dependencies**: FastAPI, Pydantic, Motor (async MongoDB driver), Temporal Python SDK, React 18, React Router, TanStack Query
+**Primary Dependencies**: FastAPI, Pydantic, Motor (async MongoDB driver), Temporal Python SDK, React 18, React Router, TanStack Query, Tailwind CSS 3.x (utility-first styling), Material Symbols Outlined (icon font), Space Grotesk / Inter / Fira Code (Google Fonts)
 **Storage**: MongoDB (primary), Redis (cache + coordination), S3-compatible object storage (logs/patches)
 **Testing**: pytest + pytest-asyncio + pytest-cov (backend), Vitest + React Testing Library (frontend), Playwright (functional)
 **Target Platform**: Kubernetes (Linux containers), single-region active/passive
@@ -101,13 +101,27 @@ backend/
 frontend/
 ├── src/
 │   ├── components/             # Shared UI components
+│   │   ├── ui/                 # Design-system primitive components
+│   │   │   ├── Button.tsx          # Kinetic Pill — rounded-full, kinetic-gradient CTA
+│   │   │   ├── TelemetryChip.tsx   # Mono-spaced status badge (LIVE · SYNCING · FAILED)
+│   │   │   ├── IDECodePanel.tsx    # Code/YAML panel: surface-container-lowest + crosshatch bg
+│   │   │   ├── Card.tsx            # Surface-shifted card (no dividers — bg shift only)
+│   │   │   ├── ProgressBar.tsx     # 1px-height progress bar using primary-container fill
+│   │   │   └── FrostedOverlay.tsx  # Frosted Obsidian — backdrop-blur 20px, 60% opacity
+│   │   └── layout/             # App-shell layout primitives
+│   │       ├── TopAppBar.tsx       # Fixed 64px bar — RIFT wordmark + search + icons
+│   │       ├── SideNav.tsx         # Fixed 256px sidebar — Fira Code nav, CREATE pill CTA
+│   │       └── ContentShell.tsx    # main: ml-64 + asymmetric padding
 │   ├── pages/                  # Route-level page components
-│   │   ├── BatchChangesList/
-│   │   ├── BatchChangeCreate/
-│   │   ├── BatchSpecEditor/
-│   │   ├── ExecutionView/
-│   │   ├── ChangesetDashboard/
-│   │   └── CredentialSettings/
+│   │   ├── BatchChangesList/       # Batch changes dashboard (hero stats + card grid)
+│   │   ├── BatchChangeCreate/      # New batch-change form
+│   │   ├── BatchSpecEditor/        # IDE-style split-pane YAML editor
+│   │   ├── ExecutionView/          # Execution progress + log stream panel
+│   │   ├── ChangesetDashboard/     # Per-batch changeset table + filter rail
+│   │   └── CredentialSettings/    # Code host credential management
+│   ├── theme/                  # Design tokens — single source of truth
+│   │   ├── tokens.ts               # Typed color, font, spacing, radius constants
+│   │   └── tailwind.config.ts      # Design-token Tailwind extension (mirrors DESIGN.md)
 │   ├── services/               # API client layer
 │   ├── hooks/                  # Custom React hooks
 │   ├── types/                  # TypeScript type definitions
@@ -160,6 +174,126 @@ docs/
 ```
 
 **Structure Decision**: Web application layout (backend + frontend + CLI) selected based on the HLD's service-oriented architecture. Backend follows a layered architecture (API → Services → Adapters) with Temporal workflows as the orchestration layer. Frontend is a standalone React SPA. CLI is a separate TypeScript package sharing API contracts with the frontend.
+
+## Frontend Design System
+
+*Derived from `docs/design/DESIGN.md` and the four HTML mockups (batch-changes-dashboard, batch-spec-editor, changeset-management, marketing-landing-page). All frontend code must conform to these decisions.*
+
+### Philosophy: "The Kinetic Monolith"
+High-contrast Technical Noir aesthetic targeting elite engineers. Left-heavy asymmetric layouts, IDE-style layered panels, over-scaled headlines, and deliberate void space. Borders are prohibited — surface separation is achieved through tonal shifts only.
+
+### Color Tokens
+
+| Token | Hex | Role |
+|---|---|---|
+| `background` / `surface` | `#131313` | Base infinite void |
+| `surface-container-lowest` | `#0E0E0E` | Recessed / negative-elevation panels |
+| `surface-container-low` | `#1B1B1B` | Large background regions |
+| `surface-container` | `#1F1F1F` | Standard containers |
+| `surface-container-high` | `#2A2A2A` | Frosted overlays base |
+| `surface-container-highest` | `#353535` | Active / elevated panels |
+| `secondary-fixed` | `#1A1A2E` | Batch-change cards, inactive code panels |
+| `primary-container` | `#FF5543` | CTA buttons, accent, progress bars |
+| `primary` | `#FFB4A9` | Hover states, secondary accent |
+| `primary-fixed` | `#FFDAD5` | Hover glow stroke on primary buttons |
+| `tertiary` | `#45D8ED` | Syntax keywords, live-status indicators |
+| `tertiary-container` | `#00A0B1` | RUNNING status chip background |
+| `error-container` | `#93000A` | FAILED status chip background |
+| `on-error-container` | `#FFDAD6` | FAILED chip text |
+| `on-surface` / `on-background` | `#E2E2E2` | Body text |
+| `on-surface-variant` | `#E4BEB8` | Secondary / meta text |
+| `outline-variant` | `#5B403C` | Ghost-border (15% opacity) for dense tables |
+
+### Typography
+
+| Role | Font | Weight | Style rule |
+|---|---|---|---|
+| Display / Headlines | Space Grotesk | 800 ExtraBold | `tracking-widest`, `uppercase`, intentionally over-scaled |
+| Body / Documentation | Inter | 400–600 | `body-md` density — technical manual feel |
+| Metadata / Code / Status | Fira Code | 400–500 | All numbers, timestamps, version strings, status labels |
+
+Loaded via Google Fonts: `Space Grotesk:wght@300;400;500;600;700;800`, `Inter:wght@300;400;500;600;700`, `Fira Code:wght@400;500`.
+
+### Radius Rules
+
+| Context | Value |
+|---|---|
+| All panels, cards, code panels, data tables | `0px` (sharp / none) |
+| Buttons (Kinetic Pill), toggle groups, chips | `9999px` (`rounded-full`) |
+| **Never use** | `4px`–`8px` rounded-md — forbidden |
+
+### Component Primitives
+
+#### `Button` — Kinetic Pill
+```
+Variant: primary
+  bg: kinetic-gradient  (radial #FF5543 → #FFB4A9)
+  text: on-primary-container (#5C0001)
+  border: none | rounded-full | px-8 py-3
+  hover: scale-105  |  active: scale-95
+  hover stroke: 4px outer ring of primary-fixed (#FFDAD5)
+
+Variant: ghost
+  text: primary (#FFB4A9)
+  border: outline-variant at 20% opacity | rounded-full
+```
+
+#### `TelemetryChip` — Status Badge
+```
+Font: Fira Code, 10px, uppercase, tracking-tighter
+Structure: [colored dot] [STATUS TEXT]
+States:
+  RUNNING  → bg: tertiary-container  | text: on-tertiary-container
+  FAILED   → bg: error-container     | text: on-error-container
+  OPEN/LIVE → bg: primary-container  | text: on-primary-container
+  SYNCING  → bg: secondary-container | text: secondary
+No border, no rounded-md — pill (rounded-full) only
+```
+
+#### `IDECodePanel` — YAML / Log Viewer
+```
+bg: surface-container-lowest (#0E0E0E)
+pattern: 1px crosshatch dots, 24px spacing, outline-variant at 10% opacity
+thin scrollbar: 4px thumb at #353535 on #131313 track
+syntax colors:
+  keywords   → tertiary (#45D8ED)
+  strings    → #A5D6FF
+  YAML keys  → primary (#FFB4A9)
+```
+
+#### `FrostedOverlay` — Command Palette / Modals
+```
+bg: surface-container-high (#2A2A2A) at 60% opacity
+backdrop-filter: blur(20px)  — "Frosted Obsidian"
+ambient glow shadow: 64px blur, 5% primary (#FFB4A9)
+```
+
+#### `Card` — Batch Change Card
+```
+bg: secondary-fixed (#1A1A2E)  (default) | hover: #1F1F3D
+no border, no divider lines
+padding: p-6
+border-radius: 0 (sharp)
+left accent: border-l-4 border-primary-container for active/featured cards
+```
+
+### Layout Patterns
+
+| Pattern | Specification |
+|---|---|
+| App shell | Fixed 64px `TopAppBar` + fixed 256px `SideNav` + scrollable `ContentShell` (`ml-64`) |
+| Sidebar separation | No border — shift from `surface` (#131313) to `surface-container-low` (#1B1B1B) |
+| Content asymmetry | Code/data panel: **65%** width · Docs/meta panel: **35%** — never equal columns |
+| Section breathing room | `spacing-20` (4.5rem) between major sections |
+| Dense data areas | `spacing-2` (0.4rem) row gap to maximise information density |
+| Hero stat block | Left: Space Grotesk 7xl ExtraBold heading · Right: `secondary-fixed` impact-telemetry card |
+| Table ghost borders | `outline-variant` at **15% opacity** — felt, not seen |
+
+### Icon System
+Material Symbols Outlined via Google Fonts CDN (`font-variation-settings: 'FILL' 0, 'wght' 400`). Rendered as text nodes with `.material-symbols-outlined` class. Interactive icons use `hover:text-primary` + `active:scale-90` transitions.
+
+### Tailwind Config (`frontend/src/theme/tailwind.config.ts`)
+All color tokens above must be registered as Tailwind color extensions matching the names in the table verbatim (kebab-case). Font families: `headline` → Space Grotesk, `body` → Inter, `label` → Inter, `mono` → Fira Code. Border-radius extensions: `DEFAULT: 1rem`, `lg: 2rem`, `xl: 3rem`, `full: 9999px`. The `kinetic-gradient` utility must be created as a Tailwind plugin.
 
 ## Complexity Tracking
 

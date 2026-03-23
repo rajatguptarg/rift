@@ -1,7 +1,7 @@
 # Tasks: Rift Batch Changes Platform
 
 **Input**: Design documents from `/specs/001-batch-changes-platform/`
-**Prerequisites**: plan.md (loaded), spec.md (loaded), research.md (loaded), data-model.md (loaded), contracts/api.yaml (loaded), quickstart.md (loaded)
+**Prerequisites**: plan.md ✓ (updated with Frontend Design System), spec.md ✓, research.md ✓, data-model.md ✓, contracts/api.yaml ✓, quickstart.md ✓, docs/design/DESIGN.md ✓
 
 **Tests**: Not explicitly requested in the feature specification. Test tasks are omitted. Tests should be added per the constitution (≥80% coverage) during implementation.
 
@@ -29,11 +29,12 @@
 
 - [ ] T001 Create root project directory structure per plan.md (backend/, frontend/, cli/, helm/, docs/adr/, .github/workflows/)
 - [ ] T002 Initialize backend Python project with FastAPI, Pydantic, Motor, Temporal SDK dependencies in backend/pyproject.toml
-- [ ] T003 [P] Initialize frontend React 18 + TypeScript 5.x project with Vite, TanStack Query, React Router in frontend/package.json
-- [ ] T004 [P] Initialize CLI TypeScript project with commander and node-fetch in cli/package.json
-- [ ] T005 [P] Create Docker Compose file for MongoDB, Redis, and Temporal dev server in docker-compose.yml
-- [ ] T006 [P] Create environment variable template with all required config vars in .env.example
-- [ ] T007 [P] Create root Makefile with lint, test, format, and dev start commands in Makefile
+- [ ] T003 [P] Initialize frontend React 18 + TypeScript 5.x project with Vite, TanStack Query, React Router, Tailwind CSS 3.x, Vitest, Playwright in frontend/package.json; add Google Fonts link (Space Grotesk, Inter, Fira Code) and Material Symbols Outlined to frontend/index.html
+- [ ] T004 [P] Create `frontend/src/theme/tailwind.config.ts` — extend Tailwind with all Kinetic Monolith design tokens: full color map (background, surface-container-*, primary-container, tertiary, secondary-fixed, etc.), fontFamily (headline→Space Grotesk, body/label→Inter, mono→Fira Code), borderRadius scale (DEFAULT 1rem, lg 2rem, xl 3rem, full 9999px), and `kinetic-gradient` radial-gradient plugin; mirrors `docs/design/DESIGN.md` exactly
+- [ ] T005 [P] Initialize CLI TypeScript project with commander and node-fetch in cli/package.json
+- [ ] T006 [P] Create Docker Compose file for MongoDB, Redis, and Temporal dev server in docker-compose.yml
+- [ ] T007 [P] Create environment variable template with all required config vars in .env.example
+- [ ] T008 [P] Create root Makefile with lint, test, format, and dev start commands in Makefile
 
 ---
 
@@ -78,10 +79,21 @@
 
 ### Frontend Foundation
 
-- [ ] T029 Setup frontend app shell with React Router route definitions in frontend/src/App.tsx
-- [ ] T030 [P] Implement typed API client service with TanStack Query integration in frontend/src/services/api.ts
-- [ ] T031 [P] Implement auth context provider and useAuth hook in frontend/src/hooks/useAuth.ts
-- [ ] T032 [P] Create shared TypeScript type definitions from API contract in frontend/src/types/api.ts
+- [ ] T029 Create design-system primitive components in `frontend/src/components/ui/`:
+  - `Button.tsx` — Kinetic Pill: rounded-full, `kinetic-gradient` primary variant (bg radial #FF5543→#FFB4A9, text on-primary-container), ghost secondary variant (text primary, outline-variant border at 20%), `hover:scale-105 active:scale-95`, `hover:ring-4 hover:ring-primary-fixed` glow stroke
+  - `TelemetryChip.tsx` — Fira Code 10px uppercase status badge; states: RUNNING (bg tertiary-container, text on-tertiary-container), FAILED (bg error-container, text on-error-container), OPEN/LIVE (bg primary-container, text on-primary-container), SYNCING (bg secondary-container, text secondary); rounded-full, no border
+  - `IDECodePanel.tsx` — bg surface-container-lowest (#0E0E0E), 1px crosshatch dot pattern (24px spacing, outline-variant at 10% opacity), 4px scrollbar thumb (#353535), Fira Code; exports syntax class names: `.syntax-keyword` (tertiary), `.syntax-string` (#A5D6FF), `.syntax-key` (primary)
+  - `Card.tsx` — bg secondary-fixed (#1A1A2E), sharp corners (borderRadius 0), hover bg #1F1F3D, optional `accent` prop adds `border-l-4 border-primary-container`; no divider lines (whitespace separation only)
+  - `ProgressBar.tsx` — h-1 full-width track (bg surface-container-highest, rounded-full), fill div using `bg-primary-container` with `transition-all duration-1000`
+  - `FrostedOverlay.tsx` — bg surface-container-high at 60% opacity, `backdrop-blur-xl`, `shadow-[0_0_64px_rgba(255,180,169,0.05)]` ambient glow; used for modals and command palette
+- [ ] T030 Create app-shell layout components in `frontend/src/components/layout/`:
+  - `TopAppBar.tsx` — fixed 64px header, bg #131313; left: RIFT wordmark (Space Grotesk ExtraBold, #FF5543, tracking-widest uppercase) + search input (rounded-full, bg surface-container-highest); right: Material Symbols Outlined icon buttons with `hover:text-primary active:scale-90`
+  - `SideNav.tsx` — fixed 256px, bg #131313, **no border** (surface shift separates from content); nav items: Fira Code xs uppercase tracking-widest, active item: bg surface-container-low + `border-l-4 border-primary-container` + text primary-container; bottom: CREATE pill button (kinetic-gradient, rounded-full)
+  - `ContentShell.tsx` — `<main>` wrapper with `ml-64 pt-16 bg-black min-h-screen`
+- [ ] T031 [P] Setup frontend app shell with React Router route stubs and `QueryClientProvider` wrapping `<ContentShell>` in frontend/src/App.tsx
+- [ ] T032 [P] Implement typed API client base with axios interceptors (auth header, 401 redirect) in frontend/src/services/api.ts
+- [ ] T033 [P] Implement auth context provider and useAuth hook in frontend/src/hooks/useAuth.ts
+- [ ] T034 [P] Create shared TypeScript type definitions from API contract in frontend/src/types/api.ts
 
 **Checkpoint**: Foundation ready — user story implementation can now begin in parallel
 
@@ -127,11 +139,11 @@
 
 ### Frontend Pages
 
-- [ ] T048 [P] [US1] Create BatchChangesList page with state filters and pagination in frontend/src/pages/BatchChangesList/index.tsx
-- [ ] T049 [P] [US1] Create BatchChangeCreate page with name, namespace, and spec input in frontend/src/pages/BatchChangeCreate/index.tsx
-- [ ] T050 [US1] Create BatchSpecEditor page with YAML editor and repository preview panel in frontend/src/pages/BatchSpecEditor/index.tsx
-- [ ] T051 [US1] Create ExecutionView page with real-time per-workspace logs, step diffs, and timeline in frontend/src/pages/ExecutionView/index.tsx
-- [ ] T052 [US1] Implement useExecutionStream SSE hook for live execution updates in frontend/src/hooks/useExecutionStream.ts
+- [ ] T048 [P] [US1] Create `BatchChangesList` page in `frontend/src/pages/BatchChangesList/index.tsx` — hero section: Space Grotesk 7xl ExtraBold heading ("Batch\nOperations" with primary-container span) + secondary-fixed impact-telemetry card (Fira Code meta label + ExtraBold stat); filter toggle pill group (rounded-full, surface-container-lowest bg); batch change `<Card>` grid using `<TelemetryChip>` for status + `<ProgressBar>` for running items; CREATE kinetic-gradient pill CTA
+- [ ] T049 [P] [US1] Create `BatchChangeCreate` page in `frontend/src/pages/BatchChangeCreate/index.tsx` — name and description form fields (sharp-corner inputs, on-surface-variant labels), namespace selector; "Start from scratch" tile; submit → navigate to BatchSpecEditor; integrates template selector (US5 hook point)
+- [ ] T050 [US1] Create `BatchSpecEditor` page in `frontend/src/pages/BatchSpecEditor/index.tsx` — IDE split-pane: left 65% `<IDECodePanel>` YAML editor with `.syntax-keyword`/`.syntax-key`/`.syntax-string` highlighting; right 35% preview panel (surface-container bg, resolved repo list); workspace exclusion checkboxes; "Run batch spec" `<Button variant="primary">` CTA
+- [ ] T051 [US1] Create `ExecutionView` page in `frontend/src/pages/ExecutionView/index.tsx` — workspace execution list (each row: repo name + `<TelemetryChip>` state + duration in Fira Code); expandable `<IDECodePanel>` log stream per workspace; SSE consumer via `useExecutionStream`; step diff viewer panel
+- [ ] T052 [US1] Implement `useExecutionStream` SSE hook in `frontend/src/hooks/useExecutionStream.ts` — creates EventSource to `/batch-changes/{id}/runs/{runId}/stream`, updates TanStack Query cache with workspace execution events
 
 **Checkpoint**: User Story 1 is fully functional — users can create, preview, and apply batch changes via the web UI
 
@@ -170,9 +182,9 @@
 
 ### Frontend Pages
 
-- [ ] T064 [US2] Create ChangesetDashboard page with state/review/CI filters and status columns in frontend/src/pages/ChangesetDashboard/index.tsx
-- [ ] T065 [US2] Implement BurndownChart component with daily data visualization in frontend/src/components/BurndownChart.tsx
-- [ ] T066 [US2] Implement ChangesetBulkActions component (publish, close, archive selections) in frontend/src/components/ChangesetBulkActions.tsx
+- [ ] T064 [US2] Create `ChangesetDashboard` page in `frontend/src/pages/ChangesetDashboard/index.tsx` — filter rail (state/review/CI dropdowns as ghost `<Button>` pills); changeset table rows (alternate bg between surface-container-low and surface-container-lowest, `outline-variant` at 15% opacity ghost row borders, `<TelemetryChip>` for publication/CI/review state columns, external PR link in Fira Code); bulk-select checkboxes
+- [ ] T065 [US2] Add `<BurndownChart>` component to ChangesetDashboard in `frontend/src/components/BurndownChart.tsx` — SVG line chart of merged changesets over time; fill color `primary-container`, axis labels in Fira Code mono, bg surface-container-lowest; `<ProgressBar>` summary strip at top showing % merged
+- [ ] T066 [US2] Implement `<ChangesetBulkActions>` component in `frontend/src/components/ChangesetBulkActions.tsx` — kinetic-gradient "Publish" pill CTA, publish-mode dropdown (Full PR / Draft PR / Push only) as ghost button group, confirm action; uses `FrostedOverlay` for confirmation modal
 
 **Checkpoint**: User Stories 1 AND 2 are complete — the full core loop (create → execute → apply → publish → track) works end-to-end
 
@@ -209,7 +221,7 @@
 - [ ] T074 [US4] Implement CredentialService (CRUD, scope resolution per namespace/user/global) in backend/src/services/credential_service.py
 - [ ] T075 [US4] Implement credentials API routes (list, create, delete) with token redaction in backend/src/api/routes/credentials.py
 - [ ] T076 [US4] Enforce namespace-scoped access control rules in auth middleware in backend/src/api/middleware/auth.py
-- [ ] T077 [US4] Create CredentialSettings page with code host credential management UI in frontend/src/pages/CredentialSettings/index.tsx
+- [ ] T077 [US4] Create `CredentialSettings` page in `frontend/src/pages/CredentialSettings/index.tsx` — credential list using `<Card>` components (code host kind `<TelemetryChip>`, scope badge GLOBAL/ORG/USER in Fira Code, token ID in Fira Code mono, delete button ghost pill); add-credential form with code host selector and token input (sharp-corner, on-surface-variant labels); `<FrostedOverlay>` confirmation modal on delete
 
 **Checkpoint**: User Story 4 is functional — credentials and RBAC are enforced
 
@@ -226,8 +238,8 @@
 - [ ] T078 [P] [US5] Implement Template domain model with form schema and validation rules in backend/src/models/template.py
 - [ ] T079 [US5] Implement TemplateService with YAML parameter substitution and validation in backend/src/services/template_service.py
 - [ ] T080 [US5] Implement templates API routes (list, create) in backend/src/api/routes/templates.py
-- [ ] T081 [US5] Add template selection step to BatchChangeCreate page in frontend/src/pages/BatchChangeCreate/index.tsx
-- [ ] T082 [US5] Implement TemplateForm component with dynamic fields and regex validation in frontend/src/components/TemplateForm.tsx
+- [ ] T081 [US5] Add template library selection screen to `BatchChangeCreate` in `frontend/src/pages/BatchChangeCreate/TemplateSelector.tsx` — grid of `<Card>` tiles (template name as Space Grotesk headline, description in Inter body, category `<TelemetryChip>`), "Start from scratch" tile with ghost `<Button>`; selected template navigates to form step
+- [ ] T082 [US5] Implement `<TemplateForm>` in `frontend/src/pages/BatchChangeCreate/TemplateForm.tsx` — dynamic fields rendered from `form_schema`; sharp-corner input fields, Fira Code labels, inline error messages in `error` color; final submit triggers batch spec generation via API then navigates to BatchSpecEditor
 
 **Checkpoint**: User Story 5 is functional — template-driven batch change creation works
 
@@ -243,7 +255,7 @@
 
 - [ ] T083 [US6] Implement changeset import logic (resolve external URLs, create tracking records) in backend/src/services/changeset_controller.py
 - [ ] T084 [US6] Implement import changesets API route in backend/src/api/routes/changesets.py
-- [ ] T085 [US6] Add changeset import UI (URL input, import button) to ChangesetDashboard in frontend/src/pages/ChangesetDashboard/index.tsx
+- [ ] T085 [US6] Add changeset import UI to ChangesetDashboard in `frontend/src/pages/ChangesetDashboard/ImportChangesets.tsx` — "Import changesets" ghost `<Button>` opens `<FrostedOverlay>` modal with `<IDECodePanel>` textarea for PR URLs (one per line), submit calls import API, success shows imported count `<TelemetryChip>`
 
 **Checkpoint**: User Story 6 is functional — external changesets are tracked alongside Rift-created ones
 
@@ -275,6 +287,7 @@
 ### Validation
 
 - [ ] T096 Run quickstart.md end-to-end validation (full local dev setup and smoke test)
+- [ ] T097 [P] Create ADR for Kinetic Monolith design system and Tailwind CSS token architecture in `docs/adr/adr-006-design-system-kinetic-monolith.md`
 
 ---
 
@@ -317,7 +330,7 @@ Phase 1 (Setup) → Phase 2 (Foundational) → ┬→ Phase 3 (US1: Create/Execu
 ### Parallel Opportunities
 
 **Phase 1**: T003, T004, T005, T006, T007 can all run in parallel after T001+T002
-**Phase 2**: T009+T010 parallel; T012 parallel with T011; T013-T018 model tasks with [P] parallel; T024+T027 parallel with T025+T026; T030+T031+T032 parallel
+**Phase 2**: T009+T010 parallel; T012 parallel with T011; T013-T018 model tasks with [P] parallel; T024+T027 parallel with T025+T026; T031+T032+T033+T034 (frontend foundation) parallel after T029+T030
 **Phase 3**: T033+T034+T035 (models) parallel; T037+T038+T039 (repos) parallel; T048+T049 (pages) parallel
 **Phase 4**: T053+T054+T055 (models) parallel; T057+T058 (repos) parallel
 **Phase 6**: T072 parallel with other non-dependent tasks
@@ -411,4 +424,5 @@ With multiple developers:
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - Tests should be written during implementation per constitution (≥80% coverage gate)
-- 96 total tasks across 9 phases
+- 97 total tasks across 9 phases
+- **Design language**: All frontend tasks reference Kinetic Monolith components (Button, TelemetryChip, IDECodePanel, Card, ProgressBar, FrostedOverlay, TopAppBar, SideNav, ContentShell) and design tokens from `docs/design/DESIGN.md`
