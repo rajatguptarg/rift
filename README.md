@@ -11,7 +11,8 @@ Rift is an open-source platform for orchestrating large-scale, automated code ch
 - [Architecture](#architecture)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-  - [Local Development](#local-development)
+  - [Option A: Full Docker Stack (recommended)](#option-a-full-docker-stack-recommended)
+  - [Option B: Local Development (hot-reload)](#option-b-local-development-hot-reload)
 - [Running Tests](#running-tests)
 - [CLI Usage](#cli-usage)
 - [Configuration](#configuration)
@@ -91,12 +92,49 @@ Design tokens and component patterns follow the **Kinetic Monolith** design syst
 
 ### Prerequisites
 
-- Docker Desktop ≥ 4.x
-- Python 3.12
-- Node.js 20 LTS
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) ≥ 4.x (required for both options)
+- Python 3.12 _(Option B only)_
+- Node.js 20 LTS _(Option B only)_
 - `make`
 
-### Local Development
+---
+
+### Option A: Full Docker Stack (recommended)
+
+Runs every service — MongoDB, Redis, Temporal, MinIO, API, Temporal worker, and the React frontend — in Docker. No local language runtimes required.
+
+**1. Clone and start**
+
+```bash
+git clone https://github.com/your-org/rift.git
+cd rift
+make docker-up-build      # builds images and starts all services (first run)
+```
+
+On subsequent runs:
+
+```bash
+make docker-up            # start (no rebuild)
+make docker-down          # stop and remove containers + volumes
+make docker-logs          # tail api / worker / frontend logs
+```
+
+**2. Open the app**
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| API / OpenAPI docs | http://localhost:8000/docs |
+| Temporal UI | http://localhost:8088 |
+| MinIO console | http://localhost:9001 (minioadmin / minioadmin) |
+
+> The frontend nginx container proxies `/api/*` → the `api` container automatically, so there are no CORS issues and no `.env` file is needed for Docker mode.
+
+---
+
+### Option B: Local Development (hot-reload)
+
+Run infrastructure in Docker but the application services locally for faster iteration.
 
 **1. Clone and configure**
 
@@ -104,24 +142,22 @@ Design tokens and component patterns follow the **Kinetic Monolith** design syst
 git clone https://github.com/your-org/rift.git
 cd rift
 cp .env.example .env
-# Edit .env — set MONGODB_URL, JWT_SECRET, APP_SECRET_KEY at minimum
+# Review .env — defaults work for local Docker infra as-is
 ```
 
-**2. Start infrastructure**
+**2. Start infrastructure only**
 
 ```bash
-make infra
-# Starts MongoDB 7, Redis 7.2, Temporal + Temporal UI on Docker
+make infra-up
+# Starts MongoDB, Redis, Temporal, MinIO in Docker (detached)
 ```
 
 **3. Start the API**
 
 ```bash
-cd backend
-pip install -e ".[dev]"
-cd ..
-make dev-api
-# FastAPI at http://localhost:8000
+cd backend && pip install -e ".[dev]" && cd ..
+make dev-backend
+# FastAPI with hot-reload at http://localhost:8000
 # OpenAPI docs at http://localhost:8000/docs
 ```
 
@@ -135,18 +171,15 @@ make dev-worker
 **5. Start the frontend**
 
 ```bash
-cd frontend
-npm install
-cd ..
+cd frontend && npm install && cd ..
 make dev-frontend
-# Vite dev server at http://localhost:3000
+# Vite dev server with hot-reload at http://localhost:3000
 ```
 
-**All-in-one:**
+Or start everything in one go (requires separate terminal tabs per process):
 
 ```bash
-make dev
-# Starts infra + API + worker + frontend concurrently
+make dev   # infra-up + dev-backend + dev-frontend (via concurrently)
 ```
 
 ---

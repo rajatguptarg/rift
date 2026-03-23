@@ -2,7 +2,9 @@
         test test-backend test-frontend test-cli \
         lint lint-backend lint-frontend \
         format format-backend format-frontend \
-        build clean infra-up infra-down
+        build clean \
+        infra-up infra-down \
+        docker-up docker-up-build docker-down docker-logs
 
 # ───────────────────────────────────────────
 # Dev servers
@@ -62,13 +64,28 @@ build:
 	cd cli && npm run build
 
 # ───────────────────────────────────────────
-# Infrastructure (local)
+# Infrastructure (local — infra only)
 # ───────────────────────────────────────────
 infra-up:
-	docker compose up -d
+	docker compose up -d mongodb redis temporal temporal-ui minio minio-init
 
 infra-down:
 	docker compose down
+
+# ───────────────────────────────────────────
+# Full stack (Docker — all services)
+# ───────────────────────────────────────────
+docker-up:
+	docker compose up -d
+
+docker-up-build:
+	docker compose up -d --build
+
+docker-down:
+	docker compose down -v
+
+docker-logs:
+	docker compose logs -f api worker frontend
 
 # ───────────────────────────────────────────
 # Cleanup
