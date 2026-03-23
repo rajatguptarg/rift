@@ -1,0 +1,20 @@
+{
+  "identities": [
+    {
+      "name": "rift-admin",
+      "credentials": [
+        {
+          "accessKey": "minioadmin",
+          "secretKey": "minioadmin"
+        }
+      ],
+      "actions": [
+        "Read",
+        "Write",
+        "List",
+        "Tagging",
+        "Admin"
+      ]
+    }
+  ]
+}
