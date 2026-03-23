@@ -25,6 +25,7 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Python 3.12 (backend), TypeScript 5.x (frontend/CLI): Follow standard conventions
 
 ## Recent Changes
+- 002-replace-minio-storage: Replaced MinIO (AGPL) with SeaweedFS 3.71 (Apache 2.0) as S3-compatible object storage for local dev. Config: `infra/seaweedfs/s3-config.json`. S3 API on :9000, Filer UI on :8888. No changes to `S3ObjectStoreAdapter`. ADR-007.
 - 001-batch-changes-platform: Added Python 3.12 (backend), TypeScript 5.x (frontend/CLI) + FastAPI, Pydantic, Motor (async MongoDB driver), Temporal Python SDK, React 18, React Router, TanStack Query, Tailwind CSS 3.x (utility-first styling), Material Symbols Outlined (icon font), Space Grotesk / Inter / Fira Code (Google Fonts)
 
 - 001-batch-changes-platform: Added Python 3.12 (backend), TypeScript 5.x (frontend/CLI) + FastAPI, Pydantic, Motor (async MongoDB driver), Temporal Python SDK, React 18, React Router, TanStack Query

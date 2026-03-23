@@ -101,7 +101,7 @@ Design tokens and component patterns follow the **Kinetic Monolith** design syst
 
 ### Option A: Full Docker Stack (recommended)
 
-Runs every service — MongoDB, Redis, Temporal, MinIO, API, Temporal worker, and the React frontend — in Docker. No local language runtimes required.
+Runs every service — MongoDB, Redis, Temporal, SeaweedFS, API, Temporal worker, and the React frontend — in Docker. No local language runtimes required.
 
 **1. Clone and start**
 
@@ -126,7 +126,8 @@ make docker-logs          # tail api / worker / frontend logs
 | Frontend | http://localhost:3000 |
 | API / OpenAPI docs | http://localhost:8000/docs |
 | Temporal UI | http://localhost:8088 |
-| MinIO console | http://localhost:9001 (minioadmin / minioadmin) |
+| SeaweedFS S3 API | http://localhost:9000 (minioadmin / minioadmin) |
+| SeaweedFS Filer UI | http://localhost:8888 |
 
 > The frontend nginx container proxies `/api/*` → the `api` container automatically, so there are no CORS issues and no `.env` file is needed for Docker mode.
 
@@ -149,7 +150,7 @@ cp .env.example .env
 
 ```bash
 make infra-up
-# Starts MongoDB, Redis, Temporal, MinIO in Docker (detached)
+# Starts MongoDB, Redis, Temporal, SeaweedFS in Docker (detached)
 ```
 
 **3. Start the API**
