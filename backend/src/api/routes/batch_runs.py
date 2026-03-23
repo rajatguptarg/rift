@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from src.api.dependencies import CurrentUserDep, DBDep
 from src.adapters.mongo.batch_run_repo import BatchRunRepository
 from src.adapters.mongo.workspace_execution_repo import WorkspaceExecutionRepository
+from src.api.dependencies import CurrentUserDep, DBDep
 from src.models.execution import BatchRunResponse, WorkspaceExecutionResponse
 
 router = APIRouter()

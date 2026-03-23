@@ -7,9 +7,9 @@ from temporalio.common import RetryPolicy
 
 with workflow.unsafe.imports_passed_through():
     from src.workflows.activities.workspace_runner import (
+        capture_diff,
         clone_repository,
         execute_steps,
-        capture_diff,
     )
 
 
@@ -58,7 +58,7 @@ class PreviewWorkflow:
 
                 results.append({"repo_ref": repo_ref, "diff_key": diff_result["diff_key"]})
 
-            except Exception as exc:
+            except Exception:
                 failed.append(repo_ref)
                 if not skip_errors:
                     raise

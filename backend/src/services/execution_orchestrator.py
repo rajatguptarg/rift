@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from temporalio.client import Client
@@ -10,7 +9,6 @@ from src.adapters.mongo.batch_change_repo import BatchChangeRepository
 from src.adapters.mongo.batch_run_repo import BatchRunRepository
 from src.adapters.mongo.workspace_execution_repo import WorkspaceExecutionRepository
 from src.core.config import settings
-from src.core.errors import NotFoundError
 from src.core.logging import get_logger
 from src.models.batch_change import BatchChangeState
 from src.models.execution import BatchRun, BatchRunState, WorkspaceExecution

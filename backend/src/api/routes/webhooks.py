@@ -10,7 +10,7 @@ logger = get_logger(__name__)
 
 @router.post("/github")
 async def github_webhook(request: Request) -> dict:
-    payload = await request.json()
+    await request.json()
     event_type = request.headers.get("X-GitHub-Event", "")
     logger.info("GitHub webhook received", event=event_type)
     # TODO: route to reconciliation service
@@ -19,7 +19,7 @@ async def github_webhook(request: Request) -> dict:
 
 @router.post("/gitlab")
 async def gitlab_webhook(request: Request) -> dict:
-    payload = await request.json()
+    await request.json()
     event_type = request.headers.get("X-Gitlab-Event", "")
     logger.info("GitLab webhook received", event=event_type)
     return {"received": True, "event": event_type}

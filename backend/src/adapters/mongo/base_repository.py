@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Generic, TypeVar
+from typing import Any, TypeVar
 
 from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
 from pydantic import BaseModel
@@ -10,7 +10,7 @@ from src.core.errors import NotFoundError, OptimisticLockError
 T = TypeVar("T", bound=BaseModel)
 
 
-class BaseRepository(Generic[T]):
+class BaseRepository[T: BaseModel]:
     """
     Generic MongoDB repository providing optimistic concurrency via a `version`
     field. Subclasses declare `collection_name` and `model_class`.

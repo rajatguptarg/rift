@@ -3,12 +3,12 @@ from __future__ import annotations
 from fastapi import APIRouter, Query
 
 from src.api.dependencies import CurrentUserDep, DBDep
+from src.models.analytics import BurndownResponse, StatsResponse
 from src.models.changeset import ChangesetResponse, ChangesetState, CIState, ReviewDecision
 from src.models.changeset_spec import PublishMode
-from src.models.analytics import StatsResponse, BurndownResponse
 from src.models.common import CursorPage
-from src.services.changeset_controller import ChangesetController
 from src.services.analytics_service import AnalyticsService
+from src.services.changeset_controller import ChangesetController
 
 router = APIRouter()
 

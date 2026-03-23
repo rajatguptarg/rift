@@ -5,8 +5,7 @@ import uuid
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from src.adapters.mongo.base_repository import BaseRepository
-from src.core.encryption import decrypt_secret, encrypt_secret
-from src.core.errors import NotFoundError
+from src.core.encryption import encrypt_secret
 from src.core.logging import get_logger
 from src.models.credential import Credential, CredentialCreate, CredentialScope
 

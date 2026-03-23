@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from src.adapters.mongo.base_repository import BaseRepository
 from src.models.changeset_spec import ChangesetSpec
 

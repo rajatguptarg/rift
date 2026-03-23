@@ -7,13 +7,13 @@ from temporalio.worker import Worker
 
 from src.core.config import settings
 from src.core.logging import configure_logging, get_logger
-from src.workflows.preview_workflow import PreviewWorkflow
-from src.workflows.apply_workflow import ApplyWorkflow
 from src.workflows.activities.workspace_runner import (
+    capture_diff,
     clone_repository,
     execute_steps,
-    capture_diff,
 )
+from src.workflows.apply_workflow import ApplyWorkflow
+from src.workflows.preview_workflow import PreviewWorkflow
 
 logger = get_logger(__name__)
 

@@ -7,10 +7,10 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from src.adapters.mongo.batch_change_repo import BatchChangeRepository
 from src.adapters.mongo.batch_spec_repo import BatchSpecRepository
-from src.core.errors import ConflictError, NotFoundError, StateTransitionError
+from src.core.errors import ConflictError, StateTransitionError
 from src.core.logging import get_logger
 from src.models.batch_change import BatchChange, BatchChangeCreate, BatchChangeState
-from src.models.batch_spec import BatchSpec, BatchSpecCreate
+from src.models.batch_spec import BatchSpec
 
 logger = get_logger(__name__)
 
@@ -53,7 +53,7 @@ class BatchChangeService:
     async def update_spec(
         self, batch_change_id: str, spec_yaml: str, version: int
     ) -> tuple[BatchChange, BatchSpec]:
-        bc = await self._repo.get_by_id(batch_change_id)
+        await self._repo.get_by_id(batch_change_id)
 
         spec = BatchSpec(
             id=f"bs_{uuid.uuid4().hex[:12]}",

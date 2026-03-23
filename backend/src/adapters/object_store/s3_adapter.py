@@ -22,7 +22,9 @@ class S3ObjectStoreAdapter:
         )
         self._bucket = settings.object_store_bucket
 
-    def put_object(self, key: str, body: bytes, content_type: str = "application/octet-stream") -> None:
+    def put_object(
+        self, key: str, body: bytes, content_type: str = "application/octet-stream"
+    ) -> None:
         self._client.put_object(
             Bucket=self._bucket,
             Key=key,

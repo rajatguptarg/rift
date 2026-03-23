@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from motor.motor_asyncio import AsyncIOMotorDatabase
-
 from src.adapters.mongo.base_repository import BaseRepository
 from src.models.batch_change import BatchChange, BatchChangeState
 

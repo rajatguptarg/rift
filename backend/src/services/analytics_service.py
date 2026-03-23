@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 

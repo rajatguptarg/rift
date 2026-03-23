@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from src.adapters.mongo.base_repository import BaseRepository
-from src.models.execution import BatchRun, BatchRunState
+from src.models.execution import BatchRun
 
 
 class BatchRunRepository(BaseRepository[BatchRun]):

@@ -5,10 +5,9 @@ from datetime import datetime
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from src.adapters.mongo.changeset_event_repo import ChangesetEventRepository
 from src.adapters.mongo.changeset_repo import ChangesetRepository
 from src.adapters.mongo.changeset_spec_repo import ChangesetSpecRepository
-from src.adapters.mongo.changeset_event_repo import ChangesetEventRepository
-from src.core.errors import NotFoundError, StateTransitionError
 from src.core.logging import get_logger
 from src.models.changeset import (
     Changeset,
@@ -40,7 +39,11 @@ class ChangesetController:
             changeset_spec_id=spec.id,
             batch_change_id=spec.batch_change_id,
             repo_ref=spec.repo_ref,
-            state=ChangesetState.OPEN if publish_mode != PublishMode.DRAFT_PR else ChangesetState.DRAFT,
+            state=(
+                ChangesetState.OPEN
+                if publish_mode != PublishMode.DRAFT_PR
+                else ChangesetState.DRAFT
+            ),
             title=spec.title,
             branch=spec.branch,
         )
@@ -79,7 +82,7 @@ class ChangesetController:
     ) -> list[Changeset]:
         results = []
         for cid in changeset_ids:
-            cs = await self._cs_repo.get_by_id(cid)
+            await self._cs_repo.get_by_id(cid)
             updated = await self._cs_repo.update_with_version(
                 cid, 0,
                 {"state": ChangesetState.CLOSED, "closed_at": datetime.utcnow().isoformat()},

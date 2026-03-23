@@ -4,7 +4,6 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 
 from src.core import logging as log_module
-from src.core.errors import AuthenticationError
 
 logger = log_module.get_logger(__name__)
 
@@ -23,13 +22,21 @@ async def auth_middleware(request: Request, call_next):  # type: ignore[no-untyp
     if not auth_header.startswith("Bearer "):
         return JSONResponse(
             status_code=401,
-            content={"error": {"code": "AUTHENTICATION_REQUIRED", "message": "Missing or invalid Authorization header.", "details": {}}},
+            content={
+                "error": {
+                    "code": "AUTHENTICATION_REQUIRED",
+                    "message": "Missing or invalid Authorization header.",
+                    "details": {},
+                }
+            },
         )
 
     token = auth_header.removeprefix("Bearer ").strip()
 
+    from jose import JWTError
+    from jose import jwt as jose_jwt
+
     from src.core.config import settings
-    from jose import JWTError, jwt as jose_jwt
 
     try:
         payload = jose_jwt.decode(
@@ -40,7 +47,13 @@ async def auth_middleware(request: Request, call_next):  # type: ignore[no-untyp
     except JWTError:
         return JSONResponse(
             status_code=401,
-            content={"error": {"code": "AUTHENTICATION_REQUIRED", "message": "Invalid or expired token.", "details": {}}},
+            content={
+                "error": {
+                    "code": "AUTHENTICATION_REQUIRED",
+                    "message": "Invalid or expired token.",
+                    "details": {},
+                }
+            },
         )
 
     # Attach decoded claims to request state for downstream use

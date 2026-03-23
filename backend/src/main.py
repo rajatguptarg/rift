@@ -58,8 +58,16 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     # ── Routers ───────────────────────────────────────────────────────────────
-    from src.api.routes import batch_changes, batch_runs, streams
-    from src.api.routes import changesets, webhooks, credentials, templates, audit
+    from src.api.routes import (
+        audit,
+        batch_changes,
+        batch_runs,
+        changesets,
+        credentials,
+        streams,
+        templates,
+        webhooks,
+    )
 
     app.include_router(batch_changes.router, prefix="/api/v1", tags=["batch-changes"])
     app.include_router(batch_runs.router, prefix="/api/v1", tags=["batch-runs"])

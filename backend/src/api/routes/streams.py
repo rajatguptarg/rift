@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
-from src.api.dependencies import CurrentUserDep, DBDep
 from src.adapters.mongo.workspace_execution_repo import WorkspaceExecutionRepository
+from src.api.dependencies import CurrentUserDep, DBDep
 from src.core.logging import get_logger
 
 router = APIRouter()

@@ -2,17 +2,16 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 from pydantic import BaseModel, Field
-
 
 T = TypeVar("T")
 
 
 # ── Pagination ──────────────────────────────────────────────────────────────
 
-class CursorPage(BaseModel, Generic[T]):
+class CursorPage[T](BaseModel):
     items: list[T]
     next_cursor: str | None = None
     total: int | None = None

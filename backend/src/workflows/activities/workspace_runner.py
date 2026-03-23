@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import subprocess
 import tempfile
-import os
 
 from temporalio import activity
 

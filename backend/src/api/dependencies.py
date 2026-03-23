@@ -8,9 +8,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from src.adapters.mongo.client import get_database
 from src.adapters.redis.client import get_redis
-from src.core.errors import AuthenticationError
 from src.models.user import User
-
 
 # ── Database ─────────────────────────────────────────────────────────────────
 

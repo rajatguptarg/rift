@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from src.adapters.code_hosts.base import CodeHostAdapter
 from src.adapters.mongo.changeset_repo import ChangesetRepository
 from src.adapters.mongo.changeset_spec_repo import ChangesetSpecRepository
-from src.adapters.code_hosts.base import CodeHostAdapter
 from src.core.logging import get_logger
-from src.models.changeset import CIState, ReviewDecision, ChangesetState
-from src.models.changeset_spec import ChangesetSpecState
+from src.models.changeset import ChangesetState
 
 logger = get_logger(__name__)
 
@@ -24,7 +23,9 @@ class ReconciliationService:
 
     POLL_INTERVAL_SECONDS = 30
 
-    def __init__(self, db: AsyncIOMotorDatabase, code_host_adapters: dict[str, CodeHostAdapter]) -> None:
+    def __init__(
+        self, db: AsyncIOMotorDatabase, code_host_adapters: dict[str, CodeHostAdapter]
+    ) -> None:
         self._cs_repo = ChangesetRepository(db)
         self._spec_repo = ChangesetSpecRepository(db)
         self._adapters = code_host_adapters
