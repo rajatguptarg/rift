@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { IDECodePanel } from "../../components/ui/IDECodePanel.tsx";
 import { Button } from "../../components/ui/Button.tsx";
 import { api } from "../../services/api.ts";

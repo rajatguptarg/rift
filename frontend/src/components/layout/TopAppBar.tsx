@@ -1,10 +1,7 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "../ui/Button.tsx";
+import { Link } from "react-router-dom";
 
 export const TopAppBar: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
     <header className="fixed top-0 left-0 right-0 z-40 flex h-16 items-center justify-between bg-background px-6">
       {/* Left: wordmark + search */}

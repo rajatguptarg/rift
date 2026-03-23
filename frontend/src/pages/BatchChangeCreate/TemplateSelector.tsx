@@ -1,7 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import { Card } from "../../components/ui/Card.tsx";
-import { Button } from "../../components/ui/Button.tsx";
 import { TelemetryChip } from "../../components/ui/TelemetryChip.tsx";
 
 const BUILT_IN_TEMPLATES = [

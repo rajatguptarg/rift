@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FrostedOverlay } from "../../components/ui/FrostedOverlay.tsx";
 import { IDECodePanel } from "../../components/ui/IDECodePanel.tsx";
 import { Button } from "../../components/ui/Button.tsx";
-import { TelemetryChip } from "../../components/ui/TelemetryChip.tsx";
 import { api } from "../../services/api.ts";
 
 interface ImportChangesetsProps {
@@ -30,7 +29,7 @@ export const ImportChangesets: React.FC<ImportChangesetsProps> = ({
         .post(`/api/v1/batch-changes/${batchChangeId}/changesets/import`, { urls })
         .then((r) => r.data);
     },
-    onSuccess: (result: unknown[]) => {
+    onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["changesets", batchChangeId] });
       onClose();
     },

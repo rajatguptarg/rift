@@ -1,6 +1,5 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ProgressBar } from "./ui/ProgressBar.tsx";
 import { api } from "../services/api.ts";
 
 interface BurndownEntry {

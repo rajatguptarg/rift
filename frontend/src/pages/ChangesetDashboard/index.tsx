@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { TelemetryChip } from "../../components/ui/TelemetryChip.tsx";
 import { Button } from "../../components/ui/Button.tsx";
 import { ProgressBar } from "../../components/ui/ProgressBar.tsx";

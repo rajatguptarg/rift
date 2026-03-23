@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { api } from "../services/api.ts";
 
 interface AuthState {
   token: string | null;
