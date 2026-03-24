@@ -6,5 +6,4 @@ playwright-report
 .env.*
 !.env.example
 *.md
-nginx.conf
 Dockerfile

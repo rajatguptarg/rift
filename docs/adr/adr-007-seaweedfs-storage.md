@@ -32,7 +32,7 @@ SeaweedFS is run via its `weed server` unified mode with the S3 gateway (`-s3`) 
 
 The `s3-config.json` identity file is committed to the repository with local-dev placeholder credentials (`minioadmin`/`minioadmin`) and mounted read-only into the SeaweedFS container.
 
-A new `storage-init` init container (using `amazon/aws-cli`) creates the `rift-artifacts` bucket on first boot and exits immediately. Application services depend on `storage-init` completing successfully via Docker Compose's `service_completed_successfully` condition.
+A new `storage-init` init container (using `amazon/aws-cli`) checks whether the `rift-artifacts` bucket already exists and creates it only when missing. This keeps repeated `docker compose up --build` and `make docker-up-build` runs idempotent. Application services depend on `storage-init` completing successfully via Docker Compose's `service_completed_successfully` condition.
 
 ---
 

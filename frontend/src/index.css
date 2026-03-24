@@ -19,7 +19,7 @@
     @apply bg-outline-variant rounded-full;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-outline;
+    @apply bg-outline-variant;
   }
 }
 

@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
+interface WorkspaceExecutionEvent {
+  id: string;
+  event?: string;
+  [key: string]: unknown;
+}
+
 export function useExecutionStream(batchChangeId: string, runId: string): void {
   const queryClient = useQueryClient();
 
@@ -12,17 +18,17 @@ export function useExecutionStream(batchChangeId: string, runId: string): void {
 
     es.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data as string);
+        const data = JSON.parse(event.data as string) as WorkspaceExecutionEvent;
         if (data.event === "done") {
           es.close();
           return;
         }
         // Update workspace executions cache in place
-        queryClient.setQueryData<unknown[]>(
+        queryClient.setQueryData<WorkspaceExecutionEvent[]>(
           ["workspace-executions", runId],
           (old) => {
             if (!Array.isArray(old)) return old;
-            return old.map((we: Record<string, unknown>) =>
+            return old.map((we) =>
               we.id === data.id ? { ...we, ...data } : we
             );
           }

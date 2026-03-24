@@ -91,15 +91,17 @@ The health check queries the master cluster status endpoint; a 200 response indi
 
 ```sh
 /bin/sh -c "
-  aws s3api create-bucket \
+  aws s3api head-bucket \
     --bucket rift-artifacts \
     --endpoint-url http://seaweedfs:9000 \
-    2>/dev/null || true &&
-  echo 'Bucket rift-artifacts ready.'
+    >/dev/null 2>&1 || \
+  aws s3api create-bucket \
+    --bucket rift-artifacts \
+    --endpoint-url http://seaweedfs:9000
 "
 ```
 
-**Idempotency**: The `|| true` ensures the container exits 0 even if the bucket already exists (`BucketAlreadyOwnedByYou` / `BucketAlreadyExists`).
+**Idempotency**: The init step first checks bucket existence with `head-bucket`, then creates it only when missing. Re-running the stack keeps `storage-init` exit-code clean and avoids blocking services that depend on `service_completed_successfully`.
 
 ---
 

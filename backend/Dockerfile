@@ -9,10 +9,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml README.md ./
+COPY src/ ./src/
 # Install runtime deps only (no dev extras)
 RUN pip install --no-cache-dir -e .
-
-COPY src/ ./src/
 
 # ── API target ──────────────────────────────────────────────────────────────
 FROM base AS api

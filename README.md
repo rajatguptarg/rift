@@ -61,22 +61,24 @@ Rift is a self-hosted alternative to Sourcegraph Batch Changes, designed for tea
 │  routes/ → services/ → adapters/                        │
 │  JWT middleware · AES-256-GCM encryption                 │
 └──────┬───────────────────────────┬───────────────────────┘
-       │ Motor (async)             │ Temporal SDK
+       │ Motor (async)             │ Temporal SDK / boto3 S3
 ┌──────▼──────┐         ┌──────────▼──────────────────────┐
 │  MongoDB 7  │         │  Temporal Worker (Python)        │
 │  (primary   │         │  PreviewWorkflow · ApplyWorkflow │
 │   store)    │         │  activities: clone · exec · diff │
-└─────────────┘         └─────────────────────────────────┘
-       │ redis.asyncio
-┌──────▼──────┐
-│  Redis 7.2  │  (cache / pub-sub future)
-└─────────────┘
+└─────────────┘         └──────────┬──────────────────────┘
+       │ redis.asyncio             │
+┌──────▼──────┐          ┌─────────▼─────────┐
+│  Redis 7.2  │          │  SeaweedFS S3     │
+│  (cache /   │          │  logs · patches   │
+│   pub/sub)  │          │  presigned URLs   │
+└─────────────┘          └───────────────────┘
 ```
 
 **Layers:**
 
 - `backend/src/core/` — settings, logging, error types, encryption
-- `backend/src/adapters/` — MongoDB repos, Redis client, S3, code-host adapters (GitHub/GitLab)
+- `backend/src/adapters/` — MongoDB repos, Redis client, SeaweedFS/S3 object store, code-host adapters (GitHub/GitLab)
 - `backend/src/models/` — Pydantic v2 domain models with state machines
 - `backend/src/services/` — business logic (batch change CRUD, execution orchestration, reconciliation, analytics)
 - `backend/src/workflows/` — Temporal workflows and activities
@@ -126,10 +128,11 @@ make docker-logs          # tail api / worker / frontend logs
 | Frontend | http://localhost:3000 |
 | API / OpenAPI docs | http://localhost:8000/docs |
 | Temporal UI | http://localhost:8088 |
-| SeaweedFS S3 API | http://localhost:9000 (minioadmin / minioadmin) |
+| SeaweedFS S3 API | http://localhost:9000 |
 | SeaweedFS Filer UI | http://localhost:8888 |
 
 > The frontend nginx container proxies `/api/*` → the `api` container automatically, so there are no CORS issues and no `.env` file is needed for Docker mode.
+> Default local object-store credentials are defined in [`.env.example`](.env.example).
 
 ---
 
@@ -150,7 +153,8 @@ cp .env.example .env
 
 ```bash
 make infra-up
-# Starts MongoDB, Redis, Temporal, SeaweedFS in Docker (detached)
+# Starts MongoDB, Redis, Temporal (with its local Postgres backing DB), Temporal UI,
+# SeaweedFS, and bucket init in Docker
 ```
 
 **3. Start the API**
@@ -174,14 +178,10 @@ make dev-worker
 ```bash
 cd frontend && npm install && cd ..
 make dev-frontend
-# Vite dev server with hot-reload at http://localhost:3000
+# Vite dev server with hot-reload at http://localhost:5173
 ```
 
-Or start everything in one go (requires separate terminal tabs per process):
-
-```bash
-make dev   # infra-up + dev-backend + dev-frontend (via concurrently)
-```
+Run `make dev-backend`, `make dev-worker`, and `make dev-frontend` in separate terminals for local development.
 
 ---
 
@@ -191,7 +191,7 @@ make dev   # infra-up + dev-backend + dev-frontend (via concurrently)
 
 ```bash
 make test-backend
-# pytest with --cov-fail-under=80
+# pytest with --cov-fail-under=5
 ```
 
 **Frontend:**
@@ -237,17 +237,24 @@ rift batch apply --id <batch-change-id>
 
 ## Configuration
 
-All configuration is read from environment variables (see `.env.example`):
+All configuration is read from environment variables (see [`.env.example`](.env.example)). Docker mode injects these through Compose; hot-reload mode reads them from `.env`.
 
 | Variable | Required | Description |
 |---|---|---|
 | `MONGODB_URL` | ✓ | MongoDB connection string |
+| `MONGODB_DATABASE` | ✓ | MongoDB database name |
 | `REDIS_URL` | ✓ | Redis connection string |
 | `JWT_SECRET` | ✓ | Secret for JWT verification |
 | `APP_SECRET_KEY` | ✓ | AES key derivation seed (local dev) |
 | `TEMPORAL_HOST` | ✓ | Temporal frontend address |
-| `S3_BUCKET` | | Object store bucket for logs/patches |
-| `AWS_REGION` | | AWS region for S3 |
+| `TEMPORAL_NAMESPACE` | ✓ | Temporal namespace |
+| `TEMPORAL_TASK_QUEUE` | ✓ | Temporal task queue used by the worker |
+| `OBJECT_STORE_ENDPOINT` | ✓ | SeaweedFS S3 endpoint |
+| `OBJECT_STORE_BUCKET` | ✓ | Object store bucket for logs/patches |
+| `OBJECT_STORE_ACCESS_KEY` | ✓ | S3 access key for local object storage |
+| `OBJECT_STORE_SECRET_KEY` | ✓ | S3 secret key for local object storage |
+| `OBJECT_STORE_REGION` | ✓ | AWS region passed to boto3 |
+| `API_CORS_ORIGINS` | | Allowed browser origins for local frontend development as a JSON array |
 | `LOG_LEVEL` | | `DEBUG` / `INFO` / `WARNING` (default: `INFO`) |
 
 ---
@@ -259,7 +266,7 @@ All configuration is read from environment variables (see `.env.example`):
 3. Add or update tests (backend: pytest, frontend: vitest + Playwright)
 4. Ensure `make lint` and `make test` pass
 5. Commit using [Conventional Commits](https://www.conventionalcommits.org/) with a Jira ticket: `feat(api): add template generation [RIFT-42]`
-6. Open a pull request against `main` with the PR template
+6. Open a pull request against `main` with the required PR sections: what changed, why it is needed, how it was tested, and the checklist from the repo guidelines
 
 See [CLAUDE.md](CLAUDE.md) for full commit message and PR guidelines.
 
@@ -275,6 +282,7 @@ Architectural decisions are recorded in [`docs/adr/`](docs/adr/):
 | [002](docs/adr/adr-002-temporal-orchestration.md) | Temporal for Workflow Orchestration |
 | [003](docs/adr/adr-003-rest-sse-api-style.md) | REST + Server-Sent Events API Style |
 | [006](docs/adr/adr-006-design-system-kinetic-monolith.md) | Kinetic Monolith Design System |
+| [007](docs/adr/adr-007-seaweedfs-storage.md) | SeaweedFS for Local Object Storage |
 
 ---
 

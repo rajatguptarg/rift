@@ -1,4 +1,4 @@
-.PHONY: dev dev-backend dev-frontend dev-cli \
+.PHONY: dev dev-backend dev-worker dev-frontend dev-cli \
         test test-backend test-frontend test-cli \
         lint lint-backend lint-frontend \
         format format-backend format-frontend \
@@ -13,6 +13,9 @@ dev: infra-up dev-backend dev-frontend
 
 dev-backend:
 	cd backend && uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+
+dev-worker:
+	cd backend && python -m src.workflows.worker
 
 dev-frontend:
 	cd frontend && npm run dev
@@ -67,7 +70,7 @@ build:
 # Infrastructure (local — infra only)
 # ───────────────────────────────────────────
 infra-up:
-	docker compose up -d mongodb redis temporal temporal-ui minio minio-init
+	docker compose up -d mongodb redis temporal-postgresql temporal temporal-ui seaweedfs storage-init
 
 infra-down:
 	docker compose down

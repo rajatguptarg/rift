@@ -5,12 +5,12 @@ import { AuthProvider } from "./hooks/useAuth";
 import { TopAppBar } from "./components/layout/TopAppBar";
 import { SideNav } from "./components/layout/SideNav";
 import { ContentShell } from "./components/layout/ContentShell";
-import { BatchChangesList } from "./pages/BatchChangesList";
-import { BatchChangeCreate } from "./pages/BatchChangeCreate";
-import { BatchSpecEditor } from "./pages/BatchSpecEditor";
-import { ExecutionView } from "./pages/ExecutionView";
-import { ChangesetDashboard } from "./pages/ChangesetDashboard";
-import { CredentialSettings } from "./pages/CredentialSettings";
+import BatchChangesList from "./pages/BatchChangesList";
+import BatchChangeCreate from "./pages/BatchChangeCreate";
+import BatchSpecEditor from "./pages/BatchSpecEditor";
+import ExecutionView from "./pages/ExecutionView";
+import ChangesetDashboard from "./pages/ChangesetDashboard";
+import CredentialSettings from "./pages/CredentialSettings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
