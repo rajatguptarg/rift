@@ -1,0 +1,234 @@
+openapi: "3.1.0"
+info:
+  title: Rift Authentication API
+  version: "1.0.0"
+  description: |
+    Authentication endpoints for Rift web access. These endpoints support
+    self-service sign-up, sign-in, and current-session hydration for the SPA.
+
+servers:
+  - url: /api/v1
+    description: Versioned API base path
+
+tags:
+  - name: auth
+    description: Web authentication and session hydration
+
+paths:
+  /auth/sign-up:
+    post:
+      operationId: signUp
+      tags: [auth]
+      summary: Create a new standard user account and return a bearer session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignUpRequest"
+      responses:
+        "201":
+          description: User created and authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSessionResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "409":
+          $ref: "#/components/responses/UsernameConflict"
+
+  /auth/sign-in:
+    post:
+      operationId: signIn
+      tags: [auth]
+      summary: Authenticate an existing user and return a bearer session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignInRequest"
+      responses:
+        "200":
+          description: Authenticated session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSessionResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      tags: [auth]
+      summary: Return the currently authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentUserResponse"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    SignUpRequest:
+      type: object
+      required: [username, display_name, password]
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 32
+          pattern: "^[a-z0-9._-]+$"
+          description: Unique lowercase username used for sign-in
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 80
+        email:
+          type: string
+          format: email
+          description: Optional contact email
+        password:
+          type: string
+          minLength: 6
+          maxLength: 72
+          description: Plain-text password submitted over HTTPS and stored only as a hash
+
+    SignInRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          minLength: 1
+
+    UserSummary:
+      type: object
+      required: [id, username, display_name, role, bootstrap_managed, created_at]
+      properties:
+        id:
+          type: string
+          example: usr_01hxyzabc123
+        username:
+          type: string
+          example: master
+        display_name:
+          type: string
+          example: Rift Master
+        email:
+          type: string
+          format: email
+          nullable: true
+        role:
+          type: string
+          enum: [SUPER_USER, STANDARD]
+        bootstrap_managed:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    AuthSessionResponse:
+      type: object
+      required: [access_token, token_type, expires_at, user]
+      properties:
+        access_token:
+          type: string
+          description: Signed JWT bearer token
+        token_type:
+          type: string
+          enum: [Bearer]
+        expires_at:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/UserSummary"
+
+    CurrentUserResponse:
+      type: object
+      required: [user]
+      properties:
+        user:
+          $ref: "#/components/schemas/UserSummary"
+
+    ErrorDetail:
+      type: object
+      required: [code, message, details]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          $ref: "#/components/schemas/ErrorDetail"
+
+  responses:
+    ValidationError:
+      description: Invalid or incomplete request payload
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            invalidUsername:
+              value:
+                error:
+                  code: VALIDATION_ERROR
+                  message: Username must use lowercase letters, numbers, dots, dashes, or underscores.
+                  details:
+                    field: username
+
+    AuthenticationRequired:
+      description: Invalid, missing, or expired credentials
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            invalidCredentials:
+              value:
+                error:
+                  code: AUTHENTICATION_REQUIRED
+                  message: Invalid username or password.
+                  details: {}
+
+    UsernameConflict:
+      description: Username already exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            duplicateUsername:
+              value:
+                error:
+                  code: USERNAME_CONFLICT
+                  message: Username is already in use.
+                  details:
+                    field: username

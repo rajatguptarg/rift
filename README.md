@@ -16,6 +16,7 @@ Rift is an open-source platform for orchestrating large-scale, automated code ch
 - [Running Tests](#running-tests)
 - [CLI Usage](#cli-usage)
 - [Configuration](#configuration)
+- [Specifications](#specifications)
 - [Contributing](#contributing)
 - [ADRs](#adrs)
 
@@ -262,6 +263,22 @@ All configuration is read from environment variables (see [`.env.example`](.env.
 
 ---
 
+## Specifications
+
+Product and delivery specifications live in [`specs/`](specs/):
+
+| Spec | Title | Status |
+|---|---|---|
+| [001](specs/001-batch-changes-platform/spec.md) | Batch Changes Platform | Accepted |
+| [002](specs/002-replace-minio-storage/spec.md) | Replace MinIO with Open-Source S3-Compatible Storage | Accepted |
+| [003](specs/003-restore-auth-access/spec.md) | Restore Authenticated Access with Sign-In, Sign-Up, and Super User Bootstrap | Planning complete |
+
+Each spec may also include supporting artifacts such as checklists, contracts, research notes, plans, quickstarts, data models, and tasks.
+
+Spec `003-restore-auth-access` now includes its Phase 0 and Phase 1 planning artifacts in [`specs/003-restore-auth-access/`](specs/003-restore-auth-access/), including `research.md`, `data-model.md`, `quickstart.md`, and the auth/routing contracts.
+
+---
+
 ## Contributing
 
 1. Fork the repository and create a branch: `feat/XYZ-123-short-description`
@@ -287,6 +304,7 @@ Architectural decisions are recorded in [`docs/adr/`](docs/adr/):
 | [006](docs/adr/adr-006-design-system-kinetic-monolith.md) | Kinetic Monolith Design System |
 | [007](docs/adr/adr-007-seaweedfs-storage.md) | SeaweedFS for Local Object Storage |
 | [008](docs/adr/adr-008-explicit-frontend-node-types.md) | Explicit Node Typings for Frontend Builds |
+| [009](docs/adr/adr-009-local-auth-bootstrap.md) | Local Authentication Bootstrap with a Default Super User |
 
 ---
 
