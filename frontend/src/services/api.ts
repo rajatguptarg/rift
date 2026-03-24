@@ -16,13 +16,14 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Redirect to /login on 401
+// Clear token on 401 and dispatch an event so the app can redirect
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("rift_token");
-      window.location.href = "/login";
+      // Dispatch a custom event; the AuthProvider listens and redirects via React Router
+      window.dispatchEvent(new CustomEvent("rift:auth:expired"));
     }
     return Promise.reject(error);
   }

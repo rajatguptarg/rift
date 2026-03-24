@@ -32,6 +32,9 @@ x-backend-env: &backend-env
   JWT_SECRET: local-dev-jwt-secret-32chars-min!!
   JWT_ALGORITHM: HS256
   JWT_EXPIRE_MINUTES: "1440"
+  BOOTSTRAP_SUPERUSER_USERNAME: master
+  BOOTSTRAP_SUPERUSER_PASSWORD: master
+  BOOTSTRAP_SUPERUSER_DISPLAY_NAME: Rift Master
   KMS_KEY_REF: local-dev-key
   KMS_PROVIDER: local
   OBJECT_STORE_ENDPOINT: http://seaweedfs:9000

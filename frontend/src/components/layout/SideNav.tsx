@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { Button } from "../ui/Button.tsx";
+import { useAuth } from "../../hooks/useAuth.tsx";
 
 const NAV_ITEMS = [
   { label: "OVERVIEW", to: "/", icon: "dashboard" },
@@ -14,6 +15,12 @@ const NAV_ITEMS = [
 
 export const SideNav: React.FC = () => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleSignOut = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <nav className="fixed left-0 top-16 bottom-0 z-30 flex w-64 flex-col bg-background">
@@ -39,7 +46,19 @@ export const SideNav: React.FC = () => {
         ))}
       </ul>
 
-      <div className="p-4">
+      <div className="p-4 space-y-2">
+        {user && (
+          <div className="px-2 py-1">
+            <p className="font-mono text-xs text-on-surface-variant truncate">
+              {user.display_name}
+            </p>
+            {user.role === "SUPER_USER" && (
+              <span className="inline-block mt-0.5 rounded bg-primary px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-on-primary">
+                Super User
+              </span>
+            )}
+          </div>
+        )}
         <Button
           variant="primary"
           className="w-full"
@@ -48,6 +67,13 @@ export const SideNav: React.FC = () => {
           <span className="material-symbols-outlined mr-2 text-base">add</span>
           CREATE
         </Button>
+        <button
+          onClick={handleSignOut}
+          className="w-full px-4 py-2 font-mono text-xs uppercase tracking-widest text-on-surface-variant hover:text-on-surface transition-colors text-left"
+        >
+          <span className="material-symbols-outlined mr-2 text-base align-middle">logout</span>
+          Sign Out
+        </button>
       </div>
     </nav>
   );

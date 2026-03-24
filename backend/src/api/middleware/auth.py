@@ -7,15 +7,23 @@ from src.core import logging as log_module
 
 logger = log_module.get_logger(__name__)
 
+_PUBLIC_PREFIXES = (
+    "/health",
+    "/docs",
+    "/openapi.json",
+    "/redoc",
+    "/webhooks",
+    "/api/v1/auth/sign-in",
+    "/api/v1/auth/sign-up",
+)
+
 
 async def auth_middleware(request: Request, call_next):  # type: ignore[no-untyped-def]
     """
     JWT / token validation middleware.
-    Public paths (/health, /docs, /openapi.json, /webhooks) bypass auth.
+    Public paths bypass auth; all others require a valid Bearer token.
     """
-    public_prefixes = ("/health", "/docs", "/openapi.json", "/redoc", "/webhooks")
-
-    if any(request.url.path.startswith(p) for p in public_prefixes):
+    if any(request.url.path.startswith(p) for p in _PUBLIC_PREFIXES):
         return await call_next(request)
 
     auth_header = request.headers.get("Authorization", "")
@@ -56,12 +64,12 @@ async def auth_middleware(request: Request, call_next):  # type: ignore[no-untyp
             },
         )
 
-    # Attach decoded claims to request state for downstream use
     request.state.user_id = payload.get("sub")
+    request.state.username = payload.get("username", "")
     request.state.email = payload.get("email", "")
+    request.state.role = payload.get("role", "STANDARD")
     request.state.scopes = payload.get("scopes", [])
 
-    # Set correlation ID from token subject for tracing
     log_module.set_correlation_id(payload.get("jti", log_module.get_correlation_id()))
 
     return await call_next(request)
