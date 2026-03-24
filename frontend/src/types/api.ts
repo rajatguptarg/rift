@@ -118,3 +118,40 @@ export interface ApiError {
     details: Record<string, string>;
   };
 }
+
+// ── Auth / Session types (from auth-api.yaml contract) ────────────────────
+
+export type AccessRole = "SUPER_USER" | "STANDARD";
+
+export interface UserSummary {
+  id: string;
+  username: string;
+  display_name: string;
+  email: string | null;
+  role: AccessRole;
+  bootstrap_managed: boolean;
+  created_at: string;
+}
+
+export interface AuthSessionResponse {
+  access_token: string;
+  token_type: "Bearer";
+  expires_at: string;
+  user: UserSummary;
+}
+
+export interface SignInRequest {
+  username: string;
+  password: string;
+}
+
+export interface SignUpRequest {
+  username: string;
+  display_name: string;
+  email?: string;
+  password: string;
+}
+
+export interface CurrentUserResponse {
+  user: UserSummary;
+}

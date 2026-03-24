@@ -32,6 +32,11 @@ class Settings(BaseSettings):
     jwt_algorithm: str = Field(default="HS256")
     jwt_expire_minutes: int = Field(default=1440)
 
+    # Bootstrap super-user (for local dev / clean-start recovery)
+    bootstrap_superuser_username: str = Field(default="master")
+    bootstrap_superuser_password: str = Field(default="master")
+    bootstrap_superuser_display_name: str = Field(default="Rift Master")
+
     # KMS
     kms_key_ref: str = Field(default="local-dev-key")
     kms_provider: str = Field(default="local")

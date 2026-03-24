@@ -25,9 +25,9 @@
 
 **Purpose**: Prepare runtime configuration, contracts, and test scaffolding shared by all user stories
 
-- [ ] T001 Add bootstrap super-user runtime settings in `backend/src/core/config.py`, `.env.example`, and `docker-compose.yml`
-- [ ] T002 [P] Add auth testing entry points and browser-test wiring in `backend/tests/integration/conftest.py`, `backend/tests/functional/__init__.py`, and `frontend/package.json`
-- [ ] T003 [P] Sync shared auth/session API types from the contracts into `frontend/src/types/api.ts`
+- [X] T001 Add bootstrap super-user runtime settings in `backend/src/core/config.py`, `.env.example`, and `docker-compose.yml`
+- [X] T002 [P] Add auth testing entry points and browser-test wiring in `backend/tests/integration/conftest.py`, `backend/tests/functional/__init__.py`, and `frontend/package.json`
+- [X] T003 [P] Sync shared auth/session API types from the contracts into `frontend/src/types/api.ts`
 
 ---
 
@@ -37,14 +37,14 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Expand persisted user, role, and session models in `backend/src/models/user.py`
-- [ ] T005 [P] Implement Mongo-backed user persistence with username uniqueness support in `backend/src/adapters/mongo/user_repo.py`
-- [ ] T006 [P] Implement password hashing, JWT issuance, and session assembly helpers in `backend/src/services/auth_service.py`
-- [ ] T007 Update bearer-token validation and persisted current-user resolution in `backend/src/api/middleware/auth.py` and `backend/src/api/dependencies.py`
-- [ ] T008 [P] Refactor frontend auth state to support hydration, redirect intent, and role-aware session data in `frontend/src/hooks/useAuth.tsx`
-- [ ] T009 [P] Create reusable auth layout and form primitives in `frontend/src/components/auth/AuthLayout.tsx` and `frontend/src/components/auth/AuthForm.tsx`
-- [ ] T010 [P] Create visible unsupported-route fallback UI in `frontend/src/pages/NotFound/index.tsx`
-- [ ] T011 Wire public-auth, protected-app, and wildcard route skeletons in `frontend/src/App.tsx`
+- [X] T004 Expand persisted user, role, and session models in `backend/src/models/user.py`
+- [X] T005 [P] Implement Mongo-backed user persistence with username uniqueness support in `backend/src/adapters/mongo/user_repo.py`
+- [X] T006 [P] Implement password hashing, JWT issuance, and session assembly helpers in `backend/src/services/auth_service.py`
+- [X] T007 Update bearer-token validation and persisted current-user resolution in `backend/src/api/middleware/auth.py` and `backend/src/api/dependencies.py`
+- [X] T008 [P] Refactor frontend auth state to support hydration, redirect intent, and role-aware session data in `frontend/src/hooks/useAuth.tsx`
+- [X] T009 [P] Create reusable auth layout and form primitives in `frontend/src/components/auth/AuthLayout.tsx` and `frontend/src/components/auth/AuthForm.tsx`
+- [X] T010 [P] Create visible unsupported-route fallback UI in `frontend/src/pages/NotFound/index.tsx`
+- [X] T011 Wire public-auth, protected-app, and wildcard route skeletons in `frontend/src/App.tsx`
 
 **Checkpoint**: Foundation ready. User story implementation can now begin.
 
@@ -58,21 +58,21 @@
 
 ### Tests for User Story 1
 
-- [ ] T012 [P] [US1] Add password verification and session issuance unit coverage in `backend/tests/unit/test_auth_service.py`
-- [ ] T013 [P] [US1] Add auth-state hydration and redirect-intent unit coverage in `frontend/tests/unit/useAuth.test.tsx`
-- [ ] T014 [P] [US1] Add auth API contract coverage for `POST /auth/sign-in` and `GET /auth/me` in `backend/tests/integration/test_auth_routes.py`
-- [ ] T015 [P] [US1] Add protected-route redirect and route-fallback coverage from `contracts/route-access.md` in `frontend/tests/integration/auth-routing.test.tsx`
-- [ ] T016 [P] [US1] Add sign-in return-to-route browser flow coverage in `frontend/tests/e2e/auth-flows.spec.ts`
+- [X] T012 [P] [US1] Add password verification and session issuance unit coverage in `backend/tests/unit/test_auth_service.py`
+- [X] T013 [P] [US1] Add auth-state hydration and redirect-intent unit coverage in `frontend/tests/unit/useAuth.test.tsx`
+- [X] T014 [P] [US1] Add auth API contract coverage for `POST /auth/sign-in` and `GET /auth/me` in `backend/tests/integration/test_auth_routes.py`
+- [X] T015 [P] [US1] Add protected-route redirect and route-fallback coverage from `contracts/route-access.md` in `frontend/tests/integration/auth-routing.test.tsx`
+- [X] T016 [P] [US1] Add sign-in return-to-route browser flow coverage in `frontend/tests/e2e/auth-flows.spec.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T017 [US1] Implement sign-in and current-session response shaping in `backend/src/models/user.py` and `backend/src/services/auth_service.py`
-- [ ] T018 [US1] Implement `POST /auth/sign-in` and `GET /auth/me` in `backend/src/api/routes/auth.py`
-- [ ] T019 [US1] Register auth routes and public-path exemptions in `backend/src/main.py` and `backend/src/api/middleware/auth.py`
-- [ ] T020 [US1] Implement the login experience and inline invalid-credential states in `frontend/src/pages/Auth/LoginPage.tsx`
-- [ ] T021 [US1] Implement session hydration, 401 recovery, and redirect-intent handling in `frontend/src/hooks/useAuth.tsx` and `frontend/src/services/api.ts`
-- [ ] T022 [US1] Complete protected-route rendering and no-blank fallback behavior in `frontend/src/App.tsx` and `frontend/src/pages/NotFound/index.tsx`
-- [ ] T023 [US1] Record successful sign-in audit events in `backend/src/api/routes/auth.py` and `backend/src/services/audit_service.py`
+- [X] T017 [US1] Implement sign-in and current-session response shaping in `backend/src/models/user.py` and `backend/src/services/auth_service.py`
+- [X] T018 [US1] Implement `POST /auth/sign-in` and `GET /auth/me` in `backend/src/api/routes/auth.py`
+- [X] T019 [US1] Register auth routes and public-path exemptions in `backend/src/main.py` and `backend/src/api/middleware/auth.py`
+- [X] T020 [US1] Implement the login experience and inline invalid-credential states in `frontend/src/pages/Auth/LoginPage.tsx`
+- [X] T021 [US1] Implement session hydration, 401 recovery, and redirect-intent handling in `frontend/src/hooks/useAuth.tsx` and `frontend/src/services/api.ts`
+- [X] T022 [US1] Complete protected-route rendering and no-blank fallback behavior in `frontend/src/App.tsx` and `frontend/src/pages/NotFound/index.tsx`
+- [X] T023 [US1] Record successful sign-in audit events in `backend/src/api/routes/auth.py` and `backend/src/services/audit_service.py`
 
 **Checkpoint**: User Story 1 is independently functional and can serve as the MVP.
 
@@ -86,18 +86,18 @@
 
 ### Tests for User Story 2
 
-- [ ] T024 [P] [US2] Add sign-up validation and standard-role unit coverage in `backend/tests/unit/test_auth_service.py`
-- [ ] T025 [P] [US2] Add auth API contract coverage for `POST /auth/sign-up` and duplicate usernames in `backend/tests/integration/test_auth_routes.py`
-- [ ] T026 [P] [US2] Add sign-up page rendering and validation coverage in `frontend/tests/integration/auth-routing.test.tsx`
-- [ ] T027 [P] [US2] Add self-service sign-up browser flow coverage in `frontend/tests/e2e/auth-flows.spec.ts`
+- [X] T024 [P] [US2] Add sign-up validation and standard-role unit coverage in `backend/tests/unit/test_auth_service.py`
+- [X] T025 [P] [US2] Add auth API contract coverage for `POST /auth/sign-up` and duplicate usernames in `backend/tests/integration/test_auth_routes.py`
+- [X] T026 [P] [US2] Add sign-up page rendering and validation coverage in `frontend/tests/integration/auth-routing.test.tsx`
+- [X] T027 [P] [US2] Add self-service sign-up browser flow coverage in `frontend/tests/e2e/auth-flows.spec.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T028 [US2] Implement standard-user defaults and duplicate-username handling in `backend/src/services/auth_service.py` and `backend/src/adapters/mongo/user_repo.py`
-- [ ] T029 [US2] Implement `POST /auth/sign-up` in `backend/src/api/routes/auth.py`
-- [ ] T030 [US2] Implement the sign-up page and field-level validation states in `frontend/src/pages/Auth/SignUpPage.tsx`
-- [ ] T031 [US2] Share sign-in/sign-up form behavior across auth routes in `frontend/src/components/auth/AuthForm.tsx`
-- [ ] T032 [US2] Complete post-sign-up session creation and default landing redirects in `frontend/src/hooks/useAuth.tsx` and `frontend/src/App.tsx`
+- [X] T028 [US2] Implement standard-user defaults and duplicate-username handling in `backend/src/services/auth_service.py` and `backend/src/adapters/mongo/user_repo.py`
+- [X] T029 [US2] Implement `POST /auth/sign-up` in `backend/src/api/routes/auth.py`
+- [X] T030 [US2] Implement the sign-up page and field-level validation states in `frontend/src/pages/Auth/SignUpPage.tsx`
+- [X] T031 [US2] Share sign-in/sign-up form behavior across auth routes in `frontend/src/components/auth/AuthForm.tsx`
+- [X] T032 [US2] Complete post-sign-up session creation and default landing redirects in `frontend/src/hooks/useAuth.tsx` and `frontend/src/App.tsx`
 
 **Checkpoint**: User Story 2 is independently functional once a new user can register and enter the app successfully.
 
@@ -111,16 +111,16 @@
 
 ### Tests for User Story 3
 
-- [ ] T033 [P] [US3] Add bootstrap seed creation and idempotency unit coverage in `backend/tests/unit/test_bootstrap_service.py`
-- [ ] T034 [P] [US3] Add bootstrap idempotency and role-resolution integration coverage in `backend/tests/integration/test_bootstrap_auth.py`
-- [ ] T035 [P] [US3] Add clean-environment bootstrap login functional coverage in `backend/tests/functional/test_auth_journeys.py`
+- [X] T033 [P] [US3] Add bootstrap seed creation and idempotency unit coverage in `backend/tests/unit/test_bootstrap_service.py`
+- [X] T034 [P] [US3] Add bootstrap idempotency and role-resolution integration coverage in `backend/tests/integration/test_bootstrap_auth.py`
+- [X] T035 [P] [US3] Add clean-environment bootstrap login functional coverage in `backend/tests/functional/test_auth_journeys.py`
 
 ### Implementation for User Story 3
 
-- [ ] T036 [US3] Implement bootstrap super-user seeding in `backend/src/services/bootstrap_service.py`
-- [ ] T037 [US3] Invoke bootstrap seeding during API startup in `backend/src/main.py`
-- [ ] T038 [US3] Enforce persisted super-user access checks for administrative surfaces in `backend/src/api/dependencies.py` and `backend/src/api/routes/credentials.py`
-- [ ] T039 [US3] Surface bootstrap-admin navigation and credential-page access states in `frontend/src/components/layout/SideNav.tsx` and `frontend/src/pages/CredentialSettings/index.tsx`
+- [X] T036 [US3] Implement bootstrap super-user seeding in `backend/src/services/bootstrap_service.py`
+- [X] T037 [US3] Invoke bootstrap seeding during API startup in `backend/src/main.py`
+- [X] T038 [US3] Enforce persisted super-user access checks for administrative surfaces in `backend/src/api/dependencies.py` and `backend/src/api/routes/credentials.py`
+- [X] T039 [US3] Surface bootstrap-admin navigation and credential-page access states in `frontend/src/components/layout/SideNav.tsx` and `frontend/src/pages/CredentialSettings/index.tsx`
 
 **Checkpoint**: User Story 3 is independently functional once `master` / `master` works on a clean startup and admin access remains stable across restarts.
 
@@ -130,9 +130,9 @@
 
 **Purpose**: Final contract, documentation, and validation work that spans multiple stories
 
-- [ ] T040 [P] Update runtime auth setup documentation in `README.md` and `.env.example`
-- [ ] T041 [P] Reconcile implementation details with architecture and operator docs in `docs/adr/adr-009-local-auth-bootstrap.md` and `specs/003-restore-auth-access/quickstart.md`
-- [ ] T042 Verify and align final auth contracts, route-access docs, and test commands in `specs/003-restore-auth-access/contracts/auth-api.yaml`, `specs/003-restore-auth-access/contracts/route-access.md`, `backend/pyproject.toml`, and `frontend/package.json`
+- [X] T040 [P] Update runtime auth setup documentation in `README.md` and `.env.example`
+- [X] T041 [P] Reconcile implementation details with architecture and operator docs in `docs/adr/adr-009-local-auth-bootstrap.md` and `specs/003-restore-auth-access/quickstart.md`
+- [X] T042 Verify and align final auth contracts, route-access docs, and test commands in `specs/003-restore-auth-access/contracts/auth-api.yaml`, `specs/003-restore-auth-access/contracts/route-access.md`, `backend/pyproject.toml`, and `frontend/package.json`
 
 ---
 

@@ -46,6 +46,11 @@ def create_app() -> FastAPI:
     async def startup() -> None:
         await mongo_client.connect()
         await redis_client.connect()
+        # Seed the bootstrap super user if not present
+        from src.adapters.mongo.client import get_database
+        from src.services.bootstrap_service import BootstrapService
+        db = get_database()
+        await BootstrapService(db).seed()
 
     @app.on_event("shutdown")
     async def shutdown() -> None:
@@ -68,7 +73,9 @@ def create_app() -> FastAPI:
         templates,
         webhooks,
     )
+    from src.api.routes import auth as auth_routes
 
+    app.include_router(auth_routes.router, prefix="/api/v1", tags=["auth"])
     app.include_router(batch_changes.router, prefix="/api/v1", tags=["batch-changes"])
     app.include_router(batch_runs.router, prefix="/api/v1", tags=["batch-runs"])
     app.include_router(streams.router, prefix="/api/v1", tags=["streams"])

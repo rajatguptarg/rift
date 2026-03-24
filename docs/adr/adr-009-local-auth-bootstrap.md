@@ -72,10 +72,31 @@ Render authentication on explicit public routes and reserve the full application
 
 ---
 
+## Implementation Notes
+
+Implemented in feature branch `003-restore-auth-access` (2026-03-24):
+
+- **`backend/src/models/user.py`** — `User` expanded with `username`, `password_hash`, `role` (AccessRole enum), `bootstrap_managed`, `last_login_at`
+- **`backend/src/adapters/mongo/user_repo.py`** — `UserRepository` with `find_by_username`, `find_bootstrap_user`, `update_last_login`, `ensure_unique_username_index`
+- **`backend/src/services/auth_service.py`** — `AuthService.sign_in`, `AuthService.sign_up`, `hash_password`, `verify_password`, JWT issuance
+- **`backend/src/services/bootstrap_service.py`** — `BootstrapService.seed()` — idempotent startup seeding from env vars
+- **`backend/src/api/routes/auth.py`** — `POST /api/v1/auth/sign-in`, `POST /api/v1/auth/sign-up`, `GET /api/v1/auth/me`
+- **`backend/src/api/middleware/auth.py`** — Public path exemptions include `/api/v1/auth/sign-in` and `/api/v1/auth/sign-up`
+- **`backend/src/api/dependencies.py`** — `get_current_user` performs real DB lookup; `SuperUserDep` added
+- **`frontend/src/hooks/useAuth.tsx`** — Carries `UserSummary`, handles `isLoading`, rehydrates from `/api/v1/auth/me` on mount
+- **`frontend/src/App.tsx`** — `PublicLayout` / `ProtectedLayout` route split; wildcard routes to `NotFound`
+- **`frontend/src/pages/Auth/LoginPage.tsx`** and **`SignUpPage.tsx`** — Auth UI screens
+- **`frontend/src/components/auth/AuthLayout.tsx`** and **`AuthForm.tsx`** — Reusable auth UI primitives
+- **`frontend/src/components/layout/SideNav.tsx`** — Sign-out button and Super User badge
+
 ## References
 
 - [Authentication access specification](../../specs/003-restore-auth-access/spec.md)
+- [Implementation plan](../../specs/003-restore-auth-access/plan.md)
+- [Quickstart guide](../../specs/003-restore-auth-access/quickstart.md)
 - [frontend/src/hooks/useAuth.tsx](../../frontend/src/hooks/useAuth.tsx)
 - [frontend/src/services/api.ts](../../frontend/src/services/api.ts)
 - [backend/src/api/middleware/auth.py](../../backend/src/api/middleware/auth.py)
+- [backend/src/api/routes/auth.py](../../backend/src/api/routes/auth.py)
+- [backend/src/services/bootstrap_service.py](../../backend/src/services/bootstrap_service.py)
 - [README](../../README.md)

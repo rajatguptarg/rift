@@ -203,6 +203,9 @@ make test-backend
 ```bash
 make test-frontend
 # vitest with coverage
+
+# Interactive Vitest UI (browser-based test runner)
+cd frontend && npm run test:ui
 ```
 
 **All:**
@@ -249,6 +252,8 @@ All configuration is read from environment variables (see [`.env.example`](.env.
 | `MONGODB_DATABASE` | ✓ | MongoDB database name |
 | `REDIS_URL` | ✓ | Redis connection string |
 | `JWT_SECRET` | ✓ | Secret for JWT verification |
+| `JWT_ALGORITHM` | | JWT signing algorithm (default: `HS256`) |
+| `JWT_EXPIRE_MINUTES` | | Access token lifetime in minutes (default: `1440`) |
 | `APP_SECRET_KEY` | ✓ | AES key derivation seed (local dev) |
 | `TEMPORAL_HOST` | ✓ | Temporal frontend address |
 | `TEMPORAL_NAMESPACE` | ✓ | Temporal namespace |
@@ -258,6 +263,9 @@ All configuration is read from environment variables (see [`.env.example`](.env.
 | `OBJECT_STORE_ACCESS_KEY` | ✓ | S3 access key for local object storage |
 | `OBJECT_STORE_SECRET_KEY` | ✓ | S3 secret key for local object storage |
 | `OBJECT_STORE_REGION` | ✓ | AWS region passed to boto3 |
+| `BOOTSTRAP_SUPERUSER_USERNAME` | | Bootstrap super-user username (default: `master`) — change in production |
+| `BOOTSTRAP_SUPERUSER_PASSWORD` | | Bootstrap super-user password (default: `master`) — change in production |
+| `BOOTSTRAP_SUPERUSER_DISPLAY_NAME` | | Bootstrap super-user display name (default: `Rift Master`) |
 | `API_CORS_ORIGINS` | | Allowed browser origins for local frontend development as a JSON array |
 | `LOG_LEVEL` | | `DEBUG` / `INFO` / `WARNING` (default: `INFO`) |
 
@@ -305,6 +313,8 @@ Architectural decisions are recorded in [`docs/adr/`](docs/adr/):
 | [007](docs/adr/adr-007-seaweedfs-storage.md) | SeaweedFS for Local Object Storage |
 | [008](docs/adr/adr-008-explicit-frontend-node-types.md) | Explicit Node Typings for Frontend Builds |
 | [009](docs/adr/adr-009-local-auth-bootstrap.md) | Local Authentication Bootstrap with a Default Super User |
+| [010](docs/adr/adr-010-auth-implementation-phase1-phase2.md) | Auth Implementation — Phase 1 (Infrastructure) and Phase 2 (Core Auth) |
+| [011](docs/adr/adr-011-auth-implementation-phase3.md) | Auth Implementation — Phase 3 (Routes, Bootstrap Service, and Frontend Integration) |
 
 ---
 
