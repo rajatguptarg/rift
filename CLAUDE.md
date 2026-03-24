@@ -3,11 +3,11 @@
 Auto-generated from all feature plans. Last updated: 2026-03-24
 
 ## Active Technologies
-- Python 3.12 (backend), TypeScript 5.x (frontend) + FastAPI, Pydantic, Motor, python-jose, passlib[bcrypt], React 18, React Router 6, TanStack Query, axios (003-restore-auth-access)
+- Python 3.12 (backend), TypeScript 5.x (frontend) + FastAPI, Pydantic, Motor, python-jose, bcrypt, React 18, React Router 6, TanStack Query, axios (003-restore-auth-access)
 - MongoDB for user records and audit events; JWT bearer token held in browser auth state/local storage; existing Redis/Temporal/storage stack unchanged for this feature (003-restore-auth-access)
 
 - Python 3.12 (backend), TypeScript 5.x / React 18 (frontend)
-- FastAPI, Motor, python-jose, passlib[bcrypt], React Router 6, TanStack Query, axios
+- FastAPI, Motor, python-jose, bcrypt, React Router 6, TanStack Query, axios
 - MongoDB for users and roles, browser local storage for the bearer token, existing Redis and object storage unchanged for this feature
 
 ## Project Structure
@@ -40,7 +40,7 @@ specs/
 - Frontend auth work should keep public auth routes outside the protected application shell.
 
 ## Recent Changes
-- 003-restore-auth-access: Added Python 3.12 (backend), TypeScript 5.x (frontend) + FastAPI, Pydantic, Motor, python-jose, passlib[bcrypt], React 18, React Router 6, TanStack Query, axios
+- 003-restore-auth-access: Added Python 3.12 (backend), TypeScript 5.x (frontend) + FastAPI, Pydantic, Motor, python-jose, bcrypt, React 18, React Router 6, TanStack Query, axios
 
 - 003-restore-auth-access: planned first-party web authentication, Mongo-backed users, public auth routes, and a bootstrapped local super user
 

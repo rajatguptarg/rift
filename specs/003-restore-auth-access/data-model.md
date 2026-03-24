@@ -33,7 +33,7 @@ Persistent MongoDB document representing a Rift web user.
 | `username` | string | Unique sign-in identifier; stored and compared in normalized lowercase form |
 | `display_name` | string | Human-readable name shown in the UI |
 | `email` | string? | Optional contact field; not required for sign-in |
-| `password_hash` | string | Bcrypt-derived password hash; raw password is never stored |
+| `password_hash` | string | SHA-256 prehashed bcrypt hash; raw password is never stored and legacy raw bcrypt hashes remain readable |
 | `role` | enum (`SUPER_USER`, `STANDARD`) | Global authorization level for this feature |
 | `auth_subject` | string | Local auth subject in the form `local:{username}` |
 | `bootstrap_managed` | boolean | `true` for the env-seeded default super user |
@@ -48,6 +48,7 @@ Persistent MongoDB document representing a Rift web user.
 - `display_name` is required, 1-80 characters after trimming
 - `email`, when provided, must be a valid email address
 - Password input must be at least 6 characters so the required bootstrap password `master` remains valid for local development
+- Password hashing uses a SHA-256 prehash before bcrypt so secrets longer than 72 bytes remain valid
 - `bootstrap_managed=true` implies `role=SUPER_USER`
 
 **Lifecycle**

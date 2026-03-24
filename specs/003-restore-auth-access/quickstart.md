@@ -28,6 +28,7 @@ BOOTSTRAP_SUPERUSER_DISPLAY_NAME=Rift Master
 Mirror the same values in `docker-compose.yml` for Docker-based local startup.
 
 > These values are for local development only. Runtime code must read them from environment variables rather than hard-coding them.
+> Bootstrap passwords can be longer than 72 bytes; the backend prehashes with SHA-256 before bcrypt so startup does not fail on long secrets.
 
 ---
 
@@ -97,6 +98,13 @@ Open the frontend at `http://localhost:5173`.
 
 ```bash
 make test-backend
+```
+
+If you are running the backend outside Docker, reinstall backend dependencies after pulling auth changes:
+
+```bash
+cd backend
+pip install -e ".[dev]"
 ```
 
 ### Frontend

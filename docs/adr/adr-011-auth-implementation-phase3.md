@@ -42,6 +42,7 @@ A dedicated service class (`bootstrap_service.py`) handles super-user seeding:
 - Calls `ensure_unique_username_index()` on every startup (idempotent index creation).
 - Checks for an existing bootstrap-managed user with `find_bootstrap_user()`.
 - If absent, creates a `SUPER_USER` from environment config (`BOOTSTRAP_SUPERUSER_*` vars).
+- If another API worker wins the first-boot insert race, catches the duplicate-key write and re-reads the bootstrap user instead of failing startup.
 - Logs the outcome at `INFO` level via structlog.
 
 Separating this concern into its own service makes it testable in isolation from both the startup lifecycle and `AuthService`.
@@ -90,7 +91,7 @@ Already existed. Replaced because it breaks React Router state, loses the `from`
 - All new logic is covered by unit, integration, and functional tests.
 
 **Negative / Trade-offs:**
-- `main.py` startup now performs a DB query (bootstrap seed check). In high-availability deployments with multiple API instances, this creates a harmless race on first boot; the unique index ensures only one user is created.
+- `main.py` startup now performs a DB query (bootstrap seed check). In multi-worker or multi-instance deployments, first boot still races on the initial insert, but the duplicate-key path is now handled explicitly and collapses back to the single bootstrap user.
 - The `rift:auth:expired` event is a non-standard browser API pattern. Teams unfamiliar with custom events may find it unexpected; the pattern is documented in this ADR and in the `api.ts` inline comment.
 
 ---

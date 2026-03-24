@@ -1,30 +1,44 @@
 from __future__ import annotations
 
+import hashlib
 import uuid
-from datetime import datetime, timedelta, timezone
+from base64 import b64encode
+from datetime import UTC, datetime, timedelta
 
+import bcrypt
 from jose import jwt as jose_jwt
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from passlib.context import CryptContext
 
 from src.adapters.mongo.user_repo import UserRepository
 from src.core.config import settings
 from src.models.user import AccessRole, User, UserSummary
 
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+_PASSWORD_HASH_PREFIX = "bcrypt-sha256$"
+
+
+def _prehash_password(plain: str) -> bytes:
+    digest = hashlib.sha256(plain.encode("utf-8")).digest()
+    return b64encode(digest)
 
 
 def hash_password(plain: str) -> str:
-    return _pwd_context.hash(plain)
+    bcrypt_hash = bcrypt.hashpw(_prehash_password(plain), bcrypt.gensalt()).decode("utf-8")
+    return f"{_PASSWORD_HASH_PREFIX}{bcrypt_hash}"
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return _pwd_context.verify(plain, hashed)
+    try:
+        if hashed.startswith(_PASSWORD_HASH_PREFIX):
+            encoded_hash = hashed.removeprefix(_PASSWORD_HASH_PREFIX).encode("utf-8")
+            return bcrypt.checkpw(_prehash_password(plain), encoded_hash)
+        return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+    except ValueError:
+        return False
 
 
 def _issue_token(user: User) -> tuple[str, datetime]:
     """Return (access_token, expires_at)."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     expires_at = now + timedelta(minutes=settings.jwt_expire_minutes)
     payload = {
         "sub": user.id,
@@ -60,7 +74,7 @@ class AuthService:
         user = await self._repo.find_by_username(username)
         if user is None or not verify_password(password, user.password_hash):
             raise ValueError("Invalid username or password.")
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         await self._repo.update_last_login(user.id, now)
         token, expires_at = _issue_token(user)
         return user, token, expires_at

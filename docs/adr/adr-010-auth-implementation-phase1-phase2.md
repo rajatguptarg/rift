@@ -29,9 +29,9 @@ The `User` Pydantic model is extended to carry all fields required for first-par
 
 ### Auth service (T006)
 
-`AuthService` encapsulates password hashing (`bcrypt` via `passlib`), JWT issuance (`python-jose`), sign-in, and sign-up. These responsibilities live in a service layer rather than directly in FastAPI route handlers to keep business logic testable without an HTTP layer.
+`AuthService` encapsulates password hashing, JWT issuance (`python-jose`), sign-in, and sign-up. These responsibilities live in a service layer rather than directly in FastAPI route handlers to keep business logic testable without an HTTP layer.
 
-Passwords are hashed with bcrypt (`CryptContext(schemes=["bcrypt"])`). Token payloads include `sub` (user ID), `username`, `role`, `email`, `jti` (UUID hex), `iat`, and `exp`. The `role` claim in the JWT is informational only — the authoritative check on protected endpoints reads `role` from the database via `get_current_user`, not from the token, to prevent privilege escalation through stale tokens.
+Passwords are now hashed with a SHA-256 prehash before bcrypt, and sign-in still accepts legacy raw `$2...` bcrypt hashes. This removes the runtime dependency on `passlib`, keeps long secrets compatible with modern `bcrypt` releases, and preserves existing local user records. Token payloads include `sub` (user ID), `username`, `role`, `email`, `jti` (UUID hex), `iat`, and `exp`. The `role` claim in the JWT is informational only — the authoritative check on protected endpoints reads `role` from the database via `get_current_user`, not from the token, to prevent privilege escalation through stale tokens.
 
 ### Middleware update (T007a)
 
@@ -95,7 +95,7 @@ The existing `UserResponse` and new `UserSummary` serve slightly different shape
 ### Negative / Trade-offs
 
 - `get_current_user` now issues a MongoDB query on every authenticated request. A caching layer (Redis or in-process short-lived cache keyed on `user_id`) may be needed at higher traffic volumes.
-- `passlib` with `bcrypt` adds a C-extension dependency; ensure the Docker image includes the required build tools or pin to a pre-built wheel.
+- Direct `bcrypt` still adds a C-extension dependency; ensure the Docker image includes the required build tools or uses an environment that can install pre-built wheels.
 
 ### Neutral
 
@@ -107,6 +107,7 @@ The existing `UserResponse` and new `UserSummary` serve slightly different shape
 ## References
 
 - [ADR-009: Local Auth Bootstrap Decision](adr-009-local-auth-bootstrap.md)
+- [ADR-012: Password Hash Compatibility and Long-Secret Support](adr-012-password-hash-compatibility.md)
 - [Spec 003: Restore Authenticated Access](../../specs/003-restore-auth-access/spec.md)
 - `backend/src/models/user.py`
 - `backend/src/adapters/mongo/user_repo.py`

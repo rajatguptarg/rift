@@ -60,7 +60,8 @@ Rift is a self-hosted alternative to Sourcegraph Batch Changes, designed for tea
 ┌──────────────────────▼──────────────────────────────────┐
 │                  API (FastAPI / Python)                  │
 │  routes/ → services/ → adapters/                        │
-│  JWT middleware · AES-256-GCM encryption                 │
+│  JWT middleware · SHA-256 prehashed bcrypt passwords     │
+│  AES-256-GCM encryption                                  │
 └──────┬───────────────────────────┬───────────────────────┘
        │ Motor (async)             │ Temporal SDK / boto3 S3
 ┌──────▼──────┐         ┌──────────▼──────────────────────┐
@@ -264,10 +265,12 @@ All configuration is read from environment variables (see [`.env.example`](.env.
 | `OBJECT_STORE_SECRET_KEY` | ✓ | S3 secret key for local object storage |
 | `OBJECT_STORE_REGION` | ✓ | AWS region passed to boto3 |
 | `BOOTSTRAP_SUPERUSER_USERNAME` | | Bootstrap super-user username (default: `master`) — change in production |
-| `BOOTSTRAP_SUPERUSER_PASSWORD` | | Bootstrap super-user password (default: `master`) — change in production |
+| `BOOTSTRAP_SUPERUSER_PASSWORD` | | Bootstrap super-user password (default: `master`) — change in production; long secrets are supported |
 | `BOOTSTRAP_SUPERUSER_DISPLAY_NAME` | | Bootstrap super-user display name (default: `Rift Master`) |
 | `API_CORS_ORIGINS` | | Allowed browser origins for local frontend development as a JSON array |
 | `LOG_LEVEL` | | `DEBUG` / `INFO` / `WARNING` (default: `INFO`) |
+
+Password storage now uses a SHA-256 prehash before bcrypt, which keeps bootstrap and user passwords compatible with modern `bcrypt` releases and avoids the 72-byte input limit. Existing legacy `$2...` bcrypt hashes are still accepted on sign-in.
 
 ---
 
@@ -315,6 +318,7 @@ Architectural decisions are recorded in [`docs/adr/`](docs/adr/):
 | [009](docs/adr/adr-009-local-auth-bootstrap.md) | Local Authentication Bootstrap with a Default Super User |
 | [010](docs/adr/adr-010-auth-implementation-phase1-phase2.md) | Auth Implementation — Phase 1 (Infrastructure) and Phase 2 (Core Auth) |
 | [011](docs/adr/adr-011-auth-implementation-phase3.md) | Auth Implementation — Phase 3 (Routes, Bootstrap Service, and Frontend Integration) |
+| [012](docs/adr/adr-012-password-hash-compatibility.md) | Password Hash Compatibility and Long-Secret Support |
 
 ---
 

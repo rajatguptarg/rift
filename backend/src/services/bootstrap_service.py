@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from pymongo.errors import DuplicateKeyError
 
 from src.adapters.mongo.user_repo import UserRepository
 from src.core import logging as log_module
@@ -31,6 +32,7 @@ class BootstrapService:
         username = settings.bootstrap_superuser_username.lower()
         display_name = settings.bootstrap_superuser_display_name
         password = settings.bootstrap_superuser_password
+        now = datetime.now(UTC)
 
         user = User(
             id=f"usr_{uuid.uuid4().hex[:12]}",
@@ -41,9 +43,16 @@ class BootstrapService:
             role=AccessRole.SUPER_USER,
             auth_subject=f"local:{username}",
             bootstrap_managed=True,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=now,
+            updated_at=now,
         )
-        await self._repo.insert(user)
+        try:
+            await self._repo.insert(user)
+        except DuplicateKeyError:
+            raced_user = await self._repo.find_by_username(username)
+            if raced_user is None or not raced_user.bootstrap_managed:
+                raise
+            logger.info("Bootstrap super user created by another worker", username=username)
+            return raced_user
         logger.info("Bootstrap super user created", username=username)
         return user

@@ -25,7 +25,7 @@ Use first-party username/password authentication that issues **JWT bearer tokens
 
 ### Rationale
 
-- The backend already depends on `python-jose` for JWT verification and `passlib[bcrypt]` for password hashing, so the core primitives are present.
+- The backend already depends on `python-jose` for JWT verification, and the runtime can use `bcrypt` directly for password hashing without changing the existing auth transport.
 - The frontend already injects `Authorization: Bearer <token>` headers and clears the token on `401`, so preserving this transport avoids a full auth rewrite.
 - CLI auth remains untouched because the feature scope is explicitly the Rift web application.
 
@@ -59,6 +59,7 @@ Keep `auth_subject`, but derive it from local auth as `local:{username}` rather 
 - The spec explicitly requires username/password sign-in and a bootstrap user named `master`.
 - The current `User` model has no username or password storage, so it cannot satisfy the requested web auth flow as-is.
 - Making email optional reduces friction for the requested local sign-up flow while preserving room for future profile or notification features.
+- Prehashing passwords with SHA-256 before bcrypt avoids bcrypt's 72-byte input limit, which matters for operator-supplied bootstrap secrets.
 
 ### Alternatives Considered
 
@@ -180,7 +181,7 @@ Target the following test pyramid during implementation:
 | Decision Area | Chosen Approach | Why |
 |---------------|-----------------|-----|
 | Auth transport | JWT bearer tokens issued by auth endpoints | Fits existing middleware and frontend token handling |
-| Identity model | Username-based local auth with password hash and role on `User` | Meets feature scope without overbuilding |
+| Identity model | Username-based local auth with SHA-256 prehashed bcrypt hash and role on `User` | Meets feature scope without overbuilding and supports long bootstrap secrets |
 | Authorization model | `SUPER_USER` / `STANDARD` enum on user record | Smallest model that satisfies bootstrap admin access |
 | Bootstrap strategy | Env-backed idempotent startup seeding of `master` / `master` in local dev | Guarantees first-run access while respecting secret-management rules |
 | Routing fix | Public auth routes + protected app layout + explicit fallback routes | Removes both `/login` blanks and undeclared-route blanks |

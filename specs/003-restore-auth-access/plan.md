@@ -10,7 +10,7 @@ Restore usable web access to Rift by adding first-party username/password authen
 ## Technical Context
 
 **Language/Version**: Python 3.12 (backend), TypeScript 5.x (frontend)  
-**Primary Dependencies**: FastAPI, Pydantic, Motor, python-jose, passlib[bcrypt], React 18, React Router 6, TanStack Query, axios  
+**Primary Dependencies**: FastAPI, Pydantic, Motor, python-jose, bcrypt, React 18, React Router 6, TanStack Query, axios  
 **Storage**: MongoDB for user records and audit events; JWT bearer token held in browser auth state/local storage; existing Redis/Temporal/storage stack unchanged for this feature  
 **Testing**: pytest + pytest-asyncio + pytest-cov (backend), Vitest + React Testing Library (frontend), Playwright for functional browser flows  
 **Target Platform**: Local Docker stack and local hot-reload development on Linux containers + modern desktop browser  

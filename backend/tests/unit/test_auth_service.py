@@ -1,11 +1,15 @@
 """Unit tests for AuthService password verification and token issuance."""
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
+import bcrypt
+import pytest
+from jose import jwt as jose_jwt
+
+from src.core.config import settings
 from src.models.user import AccessRole, User
-from src.services.auth_service import hash_password, verify_password, _issue_token
+from src.services.auth_service import _issue_token, hash_password, verify_password
 
 
 def make_user(**kwargs) -> User:
@@ -30,14 +34,23 @@ class TestPasswordHelpers:
         assert hashed != plain
         assert verify_password(plain, hashed)
 
+    def test_long_password_roundtrip(self):
+        plain = "p" * 200
+        hashed = hash_password(plain)
+        assert verify_password(plain, hashed)
+
     def test_wrong_password_fails(self):
         hashed = hash_password("correct")
         assert not verify_password("wrong", hashed)
 
     def test_empty_password_works_if_hashed(self):
-        # hash_password should handle empty strings (passlib will hash it)
+        # Empty strings are still hashable; request validation enforces stronger rules.
         hashed = hash_password("master")
         assert verify_password("master", hashed)
+
+    def test_legacy_bcrypt_hashes_still_verify(self):
+        legacy_hash = bcrypt.hashpw(b"secret123", bcrypt.gensalt()).decode("utf-8")
+        assert verify_password("secret123", legacy_hash)
 
 
 class TestIssueToken:
@@ -47,8 +60,6 @@ class TestIssueToken:
         assert isinstance(token, str)
         assert len(token) > 20
 
-        from jose import jwt as jose_jwt
-        from src.core.config import settings
         payload = jose_jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
         assert payload["sub"] == user.id
         assert payload["username"] == user.username
