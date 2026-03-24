@@ -10,7 +10,6 @@ from src.adapters.mongo.client import get_database
 from src.adapters.redis.client import get_redis
 from src.models.user import AccessRole, User
 
-
 # ── Database ─────────────────────────────────────────────────────────────────
 
 def get_db() -> AsyncIOMotorDatabase:

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from motor.motor_asyncio import AsyncIOMotorDatabase
-
 from src.adapters.mongo.base_repository import BaseRepository
 from src.models.user import User
 

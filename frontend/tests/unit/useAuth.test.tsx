@@ -16,7 +16,7 @@ const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 describe("useAuth", () => {
   beforeEach(() => {
-    localStorage.clear();
+    localStorage.removeItem("rift_token");
     vi.clearAllMocks();
   });
 

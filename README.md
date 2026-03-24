@@ -86,6 +86,7 @@ Rift is a self-hosted alternative to Sourcegraph Batch Changes, designed for tea
 - `backend/src/workflows/` — Temporal workflows and activities
 - `backend/src/api/` — FastAPI routes, middleware, DI
 - `frontend/src/` — React 18 + TypeScript SPA (TanStack Query, React Router, Tailwind CSS)
+- `frontend/tests/` — Vitest unit/integration coverage suites and Playwright end-to-end flows
 - `cli/src/` — TypeScript CLI (commander)
 
 Design tokens and component patterns follow the **Kinetic Monolith** design system (see [ADR-006](docs/adr/adr-006-design-system-kinetic-monolith.md)).
@@ -207,7 +208,12 @@ make test-frontend
 
 # Interactive Vitest UI (browser-based test runner)
 cd frontend && npm run test:ui
+
+# Browser end-to-end auth flows
+cd frontend && npm run test:e2e
 ```
+
+Vitest runs the unit and integration suites and explicitly excludes `frontend/tests/e2e/**` so Playwright specs are only executed via `npm run test:e2e`. The shared frontend test setup also installs an in-memory `localStorage` mock to keep auth tests stable across local Node runtimes and CI.
 
 **All:**
 
@@ -294,8 +300,8 @@ Spec `003-restore-auth-access` now includes its Phase 0 and Phase 1 planning art
 
 1. Fork the repository and create a branch: `feat/XYZ-123-short-description`
 2. Make your changes following the layer conventions above
-3. Add or update tests (backend: pytest, frontend: vitest + Playwright)
-4. Ensure `make lint` and `make test` pass
+3. Add or update tests (backend: pytest, frontend: Vitest for unit/integration and Playwright for `frontend/tests/e2e`)
+4. Ensure `make lint` and `make test` pass, and run `cd frontend && npm run test:e2e` when browser flows are affected
 5. Commit using [Conventional Commits](https://www.conventionalcommits.org/) with a Jira ticket: `feat(api): add template generation [RIFT-42]`
 6. Open a pull request against `main` with the required PR sections: what changed, why it is needed, how it was tested, and the checklist from the repo guidelines
 
@@ -319,6 +325,7 @@ Architectural decisions are recorded in [`docs/adr/`](docs/adr/):
 | [010](docs/adr/adr-010-auth-implementation-phase1-phase2.md) | Auth Implementation — Phase 1 (Infrastructure) and Phase 2 (Core Auth) |
 | [011](docs/adr/adr-011-auth-implementation-phase3.md) | Auth Implementation — Phase 3 (Routes, Bootstrap Service, and Frontend Integration) |
 | [012](docs/adr/adr-012-password-hash-compatibility.md) | Password Hash Compatibility and Long-Secret Support |
+| [013](docs/adr/adr-013-frontend-test-runner-boundaries.md) | Frontend Test Runner Boundaries |
 
 ---
 
