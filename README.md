@@ -133,6 +133,7 @@ make docker-logs          # tail api / worker / frontend logs
 
 > The frontend nginx container proxies `/api/*` → the `api` container automatically, so there are no CORS issues and no `.env` file is needed for Docker mode.
 > Default local object-store credentials are defined in [`.env.example`](.env.example).
+> Frontend Docker builds intentionally ignore local `*.tsbuildinfo` files and install explicit Node typings from `frontend/package.json` so `make docker-up-build` stays reproducible across machines.
 
 ---
 
@@ -180,6 +181,8 @@ cd frontend && npm install && cd ..
 make dev-frontend
 # Vite dev server with hot-reload at http://localhost:5173
 ```
+
+The frontend build compiles `vite.config.ts` via `tsconfig.node.json`, so keep dev dependencies installed before running `npm run build` or `make dev-frontend`.
 
 Run `make dev-backend`, `make dev-worker`, and `make dev-frontend` in separate terminals for local development.
 
@@ -283,6 +286,7 @@ Architectural decisions are recorded in [`docs/adr/`](docs/adr/):
 | [003](docs/adr/adr-003-rest-sse-api-style.md) | REST + Server-Sent Events API Style |
 | [006](docs/adr/adr-006-design-system-kinetic-monolith.md) | Kinetic Monolith Design System |
 | [007](docs/adr/adr-007-seaweedfs-storage.md) | SeaweedFS for Local Object Storage |
+| [008](docs/adr/adr-008-explicit-frontend-node-types.md) | Explicit Node Typings for Frontend Builds |
 
 ---
 
